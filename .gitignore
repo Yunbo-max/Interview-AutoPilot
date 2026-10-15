@@ -1,0 +1,27 @@
+# Candidate data stays outside this public repository.
+.ai-interview/
+sessions/
+private/
+recordings/
+exports/
+.env
+.env.*
+!.env.example
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.mp4
+*.pdf
+*.docx
+*.png
+*.jpg
+*.jpeg
+# Local skill installation and development artifacts
+.agents/skills/
+.claude/skills/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store

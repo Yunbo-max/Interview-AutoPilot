@@ -1,0 +1,19 @@
+{
+  "kind": "question", "schema_version": "0.1.0", "question_id": "coding-unique-span",
+  "rubric_version": "1", "task_type": "coding",
+  "problem": "Implement solve(s: str) -> int: return the length of the longest contiguous substring containing no repeated Unicode code points.",
+  "constraints": ["0 <= len(s) <= 100000", "Python string elements are code points, not grapheme clusters.", "Empty input returns 0.", "Target O(n) time; explain auxiliary space.", "Do not assume ASCII."],
+  "acceptance_criteria": ["Correct on empty, repeated and mixed inputs.", "The left boundary never moves backwards.", "Explain the current-window invariant.", "O(n) expected time with dictionary access and O(min(n, alphabet size)) auxiliary space.", "Accept any correct alternative satisfying the contract."],
+  "reference_answer": "def solve(s: str) -> int:\n    last = {}\n    left = best = 0\n    for right, char in enumerate(s):\n        if char in last:\n            left = max(left, last[char] + 1)\n        last[char] = right\n        best = max(best, right - left + 1)\n    return best\n",
+  "reference_visibility": "evaluator_until_release",
+  "hints": ["Consider a window that contains no repeated code point.", "Track the last position at which each code point occurred.", "A previously seen character must not move your left boundary backwards."],
+  "followups": ["Trace your window on abba.", "Why is the total work linear rather than quadratic?", "What changes if the input is a one-pass stream?", "How would grapheme-cluster semantics change the input preprocessing?"],
+  "tests": [
+    {"input": "", "expected": 0}, {"input": "a", "expected": 1},
+    {"input": "abba", "expected": 2}, {"input": "dvdf", "expected": 3},
+    {"input": "abcabcbb", "expected": 3}, {"input": "bbbb", "expected": 1},
+    {"input": "剑桥剑", "expected": 2}, {"input": "a😀b😀", "expected": 3}
+  ],
+  "validation_status": "manually_reviewed",
+  "source": "Original repository teaching fixture; not a benchmark or a real candidate transcript. Offline checks are reported separately."
+}

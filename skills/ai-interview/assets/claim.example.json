@@ -1,0 +1,7 @@
+{
+  "kind": "claim", "schema_version": "0.1.0", "claim_id": "fictional-c1", "revision": 0,
+  "source_id": "fictional-resume", "locator": "Project A, sentence 1",
+  "wording": "Multiple agents improved success on the task.", "claim_type": "technical",
+  "status": "unassessed", "open_condition": "Separate the architectural effect from the compute budget.",
+  "assessment_ids": []
+}

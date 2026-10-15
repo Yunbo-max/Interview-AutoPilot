@@ -1,0 +1,7 @@
+{
+  "kind": "tool_result", "schema_version": "0.1.0", "session_id": "fictional-demo", "turn_id": "fictional-t1",
+  "operation_id": "fictional-op1", "input_revision": 1, "tool": "code.check", "tool_version": null,
+  "status": "unsupported", "evidence": [],
+  "limitations": ["Synthetic unavailable-tool fixture. No candidate code was executed."],
+  "payload": {"execution": "unavailable", "fallback": "static_analysis"}
+}

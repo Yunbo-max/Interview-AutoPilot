@@ -1,0 +1,10 @@
+{
+  "name": "ai-interview",
+  "version": "0.1.0",
+  "description": "Adversarial mock interviews with fair challenges and evidence-based review. Skills-only; no bundled audio runtime.",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Interview",
+    "shortDescription": "Defend your reasoning. Not just your resume."
+  }
+}

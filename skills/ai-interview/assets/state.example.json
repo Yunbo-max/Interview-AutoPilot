@@ -1,0 +1,8 @@
+{
+  "kind": "session_state", "schema_version": "0.1.0", "session_id": "fictional-demo",
+  "revision": 0, "contract_revision": 0, "state": "READY", "floor": null,
+  "phase_id": null, "active_elapsed_seconds": null, "clock_epoch": null,
+  "last_sequence": 0, "current_question_id": null, "rubric_version": null,
+  "answer_revision": 0, "claim_ids": [], "pending_operation_ids": [],
+  "provider_bindings": {}, "storage_mode": "memory_only"
+}

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ai-interview:contracts:0.1.0",
+  "title": "AI Interview design records",
+  "description": "Record-shape contracts. Cross-record ordering, consent enforcement, test execution, timing arithmetic and evidence truth require runtime validation.",
+  "oneOf": [
+    {"$ref": "#/$defs/session_contract"}, {"$ref": "#/$defs/session_state"},
+    {"$ref": "#/$defs/question"}, {"$ref": "#/$defs/judgment"},
+    {"$ref": "#/$defs/event"}, {"$ref": "#/$defs/speech_observation"},
+    {"$ref": "#/$defs/claim"}, {"$ref": "#/$defs/tool_result"}
+  ],
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "version": {"const": "0.1.0"},
+    "strings": {"type": "array", "items": {"type": "string"}},
+    "status": {"enum": ["supported", "partial", "unsupported", "contradicted", "unassessed"]},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "locator", "type", "observed"],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/id"}, "locator": {"type": "string", "minLength": 1},
+        "type": {"enum": ["answer", "document", "code_test", "symbolic_check", "counterexample", "audio", "host_event"]},
+        "observed": {"type": "string", "minLength": 1}
+      }
+    },
+    "capabilities": {
+      "type": "object", "additionalProperties": false,
+      "required": ["microphone", "audio_analysis", "speech_to_text", "text_to_speech", "screen_capture", "camera", "safe_code_execution", "symbolic_math", "persistent_store", "continuous_timer"],
+      "properties": {
+        "microphone": {"type": "boolean"}, "audio_analysis": {"type": "boolean"},
+        "speech_to_text": {"type": "boolean"}, "text_to_speech": {"type": "boolean"},
+        "screen_capture": {"type": "boolean"}, "camera": {"type": "boolean"},
+        "safe_code_execution": {"type": "boolean"}, "symbolic_math": {"type": "boolean"},
+        "persistent_store": {"type": "boolean"}, "continuous_timer": {"type": "boolean"}
+      }
+    },
+    "consent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["microphone", "camera", "screen", "cloud_audio", "cloud_materials", "store_transcript", "store_audio", "store_video", "export"],
+      "properties": {
+        "microphone": {"type": "boolean"}, "camera": {"type": "boolean"}, "screen": {"type": "boolean"},
+        "cloud_audio": {"type": "boolean"}, "cloud_materials": {"type": "boolean"},
+        "store_transcript": {"type": "boolean"}, "store_audio": {"type": "boolean"},
+        "store_video": {"type": "boolean"}, "export": {"type": "boolean"}
+      }
+    },
+    "session_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "session_id", "contract_revision", "language", "mode", "pressure", "duration_seconds", "clock_mode", "phases", "capabilities", "consent", "consent_revision", "source_ids", "notes"],
+      "properties": {
+        "kind": {"const": "session_contract"}, "schema_version": {"$ref": "#/$defs/version"},
+        "session_id": {"$ref": "#/$defs/id"}, "contract_revision": {"type": "integer", "minimum": 0},
+        "language": {"type": "string", "minLength": 1}, "mode": {"enum": ["strict", "coach", "retry"]},
+        "pressure": {"enum": ["professional", "challenging", "high-pressure"]},
+        "duration_seconds": {"type": "integer", "minimum": 60, "maximum": 14400},
+        "clock_mode": {"enum": ["host_monotonic", "user_managed", "untimed"]},
+        "phases": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["id", "budget_seconds"],
+            "properties": {"id": {"$ref": "#/$defs/id"}, "budget_seconds": {"type": "integer", "minimum": 1}}
+          }
+        },
+        "capabilities": {"$ref": "#/$defs/capabilities"}, "consent": {"$ref": "#/$defs/consent"},
+        "consent_revision": {"type": "integer", "minimum": 0},
+        "source_ids": {"$ref": "#/$defs/strings"}, "notes": {"$ref": "#/$defs/strings"}
+      },
+      "allOf": [{
+        "if": {"properties": {"clock_mode": {"const": "host_monotonic"}}},
+        "then": {"properties": {"capabilities": {"properties": {"continuous_timer": {"const": true}}}}}
+      }]
+    },
+    "session_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "session_id", "revision", "contract_revision", "state", "floor", "phase_id", "active_elapsed_seconds", "clock_epoch", "last_sequence", "current_question_id", "rubric_version", "answer_revision", "claim_ids", "pending_operation_ids", "provider_bindings", "storage_mode"],
+      "properties": {
+        "kind": {"const": "session_state"}, "schema_version": {"$ref": "#/$defs/version"},
+        "session_id": {"$ref": "#/$defs/id"}, "revision": {"type": "integer", "minimum": 0},
+        "contract_revision": {"type": "integer", "minimum": 0},
+        "state": {"enum": ["SETUP", "READY", "ACTIVE", "PAUSED", "RECOVERING", "REVIEW", "COMPLETED"]},
+        "floor": {"enum": ["ASKING", "LISTENING", "THINKING", "EVALUATING", null]},
+        "phase_id": {"type": ["string", "null"]}, "active_elapsed_seconds": {"type": ["number", "null"], "minimum": 0},
+        "clock_epoch": {"type": ["string", "null"]}, "last_sequence": {"type": "integer", "minimum": 0},
+        "current_question_id": {"type": ["string", "null"]}, "rubric_version": {"type": ["string", "null"]},
+        "answer_revision": {"type": "integer", "minimum": 0}, "claim_ids": {"$ref": "#/$defs/strings"},
+        "pending_operation_ids": {"$ref": "#/$defs/strings"},
+        "provider_bindings": {"type": "object", "additionalProperties": {"type": "string"}},
+        "storage_mode": {"enum": ["memory_only", "local_consented"]}
+      }
+    },
+    "question": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "question_id", "rubric_version", "task_type", "problem", "constraints", "acceptance_criteria", "reference_answer", "reference_visibility", "hints", "followups", "tests", "validation_status", "source"],
+      "properties": {
+        "kind": {"const": "question"}, "schema_version": {"$ref": "#/$defs/version"},
+        "question_id": {"$ref": "#/$defs/id"}, "rubric_version": {"$ref": "#/$defs/id"},
+        "task_type": {"enum": ["coding", "mathematics", "research", "project"]},
+        "problem": {"type": "string", "minLength": 1}, "constraints": {"$ref": "#/$defs/strings"},
+        "acceptance_criteria": {"$ref": "#/$defs/strings"}, "reference_answer": {"type": "string", "minLength": 1},
+        "reference_visibility": {"const": "evaluator_until_release"}, "hints": {"$ref": "#/$defs/strings"},
+        "followups": {"$ref": "#/$defs/strings"},
+        "tests": {
+          "type": "array", "items": {
+            "type": "object", "additionalProperties": false, "required": ["input", "expected"],
+            "properties": {"input": {}, "expected": {}}
+          }
+        },
+        "validation_status": {"enum": ["unverified", "manually_reviewed", "unit_checked"]},
+        "source": {"type": "string", "minLength": 1}
+      }
+    },
+    "judgment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "assessment_id", "turn_id", "question_id", "rubric_version", "answer_revision", "status", "finding", "evidence", "limitations", "next_action", "candidate_facing", "assistance_level", "supersedes"],
+      "properties": {
+        "kind": {"const": "judgment"}, "schema_version": {"$ref": "#/$defs/version"},
+        "assessment_id": {"$ref": "#/$defs/id"}, "turn_id": {"$ref": "#/$defs/id"},
+        "question_id": {"$ref": "#/$defs/id"}, "rubric_version": {"$ref": "#/$defs/id"},
+        "answer_revision": {"type": "integer", "minimum": 0}, "status": {"$ref": "#/$defs/status"},
+        "finding": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "limitations": {"$ref": "#/$defs/strings"},
+        "next_action": {"enum": ["probe", "clarify", "counterexample", "concede", "switch", "repair", "finish", "wait"]},
+        "candidate_facing": {"type": "string"}, "assistance_level": {"type": "integer", "minimum": 0, "maximum": 3},
+        "supersedes": {"$ref": "#/$defs/strings"}
+      },
+      "allOf": [{
+        "if": {"properties": {"status": {"enum": ["supported", "contradicted"]}}},
+        "then": {"properties": {"evidence": {"minItems": 1}}}
+      }]
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "session_id", "event_id", "sequence", "turn_id", "answer_revision", "type", "host_time_ms", "payload"],
+      "properties": {
+        "kind": {"const": "event"}, "schema_version": {"$ref": "#/$defs/version"},
+        "session_id": {"$ref": "#/$defs/id"}, "event_id": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1}, "turn_id": {"type": ["string", "null"]},
+        "answer_revision": {"type": "integer", "minimum": 0},
+        "type": {"enum": ["contract_agreed", "started", "answer_finalized", "transcript_corrected", "question_asked", "judgment_recorded", "hint_requested", "answer_released", "paused", "resumed", "stopped", "deadline", "permission_changed", "tool_result", "speech_cancelled", "checkpoint", "recovered", "mode_changed", "claim_revised"]},
+        "host_time_ms": {"type": ["number", "null"], "minimum": 0},
+        "payload": {"type": "object", "description": "Event-specific payload; envelope-only schema. Runtime must validate per-event semantics."}
+      }
+    },
+    "speech_observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "turn_id", "audio_available", "audio_source_id", "interval_seconds", "metrics", "method", "limitations", "feedback"],
+      "properties": {
+        "kind": {"const": "speech_observation"}, "schema_version": {"$ref": "#/$defs/version"},
+        "turn_id": {"$ref": "#/$defs/id"}, "audio_available": {"type": "boolean"},
+        "audio_source_id": {"type": ["string", "null"]},
+        "interval_seconds": {"type": ["array", "null"], "items": {"type": "number", "minimum": 0}, "minItems": 2, "maxItems": 2},
+        "metrics": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["name", "value", "unit"],
+          "properties": {
+            "name": {"enum": ["english_words_per_min", "han_chars_per_min", "articulation_words_per_min", "pause_seconds", "pitch_p05_hz", "pitch_p95_hz", "relative_rms"]},
+            "value": {"type": "number", "minimum": 0}, "unit": {"type": "string", "minLength": 1}
+          }
+        }},
+        "method": {"type": "string", "minLength": 1}, "limitations": {"$ref": "#/$defs/strings"},
+        "feedback": {"type": "string"}
+      },
+      "allOf": [{
+        "if": {"properties": {"audio_available": {"const": false}}},
+        "then": {"properties": {"metrics": {"maxItems": 0}, "audio_source_id": {"const": null}, "interval_seconds": {"const": null}}},
+        "else": {"properties": {"audio_source_id": {"type": "string", "minLength": 1}}}
+      }]
+    },
+    "claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "claim_id", "revision", "source_id", "locator", "wording", "claim_type", "status", "open_condition", "assessment_ids"],
+      "properties": {
+        "kind": {"const": "claim"}, "schema_version": {"$ref": "#/$defs/version"},
+        "claim_id": {"$ref": "#/$defs/id"}, "revision": {"type": "integer", "minimum": 0},
+        "source_id": {"$ref": "#/$defs/id"}, "locator": {"type": "string", "minLength": 1},
+        "wording": {"type": "string", "minLength": 1},
+        "claim_type": {"enum": ["ownership", "technical", "metric", "architecture", "novelty", "result"]},
+        "status": {"$ref": "#/$defs/status"}, "open_condition": {"type": "string"},
+        "assessment_ids": {"$ref": "#/$defs/strings"}
+      }
+    },
+    "tool_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "schema_version", "session_id", "turn_id", "operation_id", "input_revision", "tool", "tool_version", "status", "evidence", "limitations", "payload"],
+      "properties": {
+        "kind": {"const": "tool_result"}, "schema_version": {"$ref": "#/$defs/version"},
+        "session_id": {"$ref": "#/$defs/id"}, "turn_id": {"type": ["string", "null"]},
+        "operation_id": {"$ref": "#/$defs/id"}, "input_revision": {"type": "integer", "minimum": 0},
+        "tool": {"type": "string", "minLength": 1}, "tool_version": {"type": ["string", "null"]},
+        "status": {"enum": ["ok", "unsupported", "permission_denied", "timeout", "cancelled", "stale", "error"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "limitations": {"$ref": "#/$defs/strings"}, "payload": {"type": "object"}
+      }
+    }
+  }
+}

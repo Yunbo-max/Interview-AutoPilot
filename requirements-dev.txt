@@ -1,0 +1,3 @@
+# Offline package/schema checks; no speech or model API dependency.
+jsonschema==4.26.0
+PyYAML==6.0.3

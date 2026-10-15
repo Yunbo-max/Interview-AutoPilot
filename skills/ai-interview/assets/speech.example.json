@@ -1,0 +1,7 @@
+{
+  "kind": "speech_observation", "schema_version": "0.1.0", "turn_id": "fictional-t1",
+  "audio_available": false, "audio_source_id": null, "interval_seconds": null,
+  "metrics": [], "method": "text_only",
+  "limitations": ["No audio was supplied; pace, pauses, pitch and emphasis were not measured."],
+  "feedback": "Only answer organization and relevance may be assessed from this text-only fixture."
+}

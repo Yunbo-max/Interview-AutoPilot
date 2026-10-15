@@ -1,0 +1,13 @@
+{
+  "kind": "question", "schema_version": "0.1.0", "question_id": "math-sample-variance",
+  "rubric_version": "1", "task_type": "mathematics",
+  "problem": "Let X_1,...,X_n be iid with mean mu and finite variance sigma^2, n >= 2. Define Xbar = (1/n) sum_i X_i. Derive E[sum_i (X_i-Xbar)^2] and an unbiased estimator of sigma^2.",
+  "constraints": ["Do not assume normality.", "n is an integer >= 2.", "Finite second moment is required.", "Show where independence is used."],
+  "acceptance_criteria": ["Use sum_i (X_i-Xbar)^2 = sum_i (X_i-mu)^2 - n(Xbar-mu)^2.", "Establish E[(Xbar-mu)^2] = sigma^2/n using independence.", "Conclude the expected numerator is (n-1)sigma^2.", "Divide by n-1 for the unbiased estimator.", "Accept a correct covariance-expansion proof."],
+  "reference_answer": "Expand around mu: sum_i (X_i-Xbar)^2 = sum_i (X_i-mu)^2 - n(Xbar-mu)^2 because sum_i (X_i-mu)=n(Xbar-mu). Taking expectations gives n*sigma^2 - n*Var(Xbar). Independence and equal variance give Var(Xbar)=sigma^2/n, hence (n-1)*sigma^2. Therefore S^2=sum_i(X_i-Xbar)^2/(n-1) is unbiased. Normality is unnecessary. In the explicitly changed follow-up with equal means and variances and common pairwise covariance rho*sigma^2, Var(Xbar)=sigma^2*(1+(n-1)*rho)/n, so E[S^2]=sigma^2*(1-rho). The covariance matrix must be valid; for this equicorrelation form, -1/(n-1) <= rho <= 1. The original iid answer must not be marked wrong for lacking this new assumption.",
+  "reference_visibility": "evaluator_until_release",
+  "hints": ["Expand each deviation around the true mean mu.", "Use sum_i(X_i-mu)=n(Xbar-mu).", "Compute Var(Xbar) under the stated independence assumption."],
+  "followups": ["Is normality needed? Identify the exact assumption that gave Var(Xbar)=sigma^2/n.", "New problem: replace independence by common pairwise covariance rho*sigma^2. How does E[S^2] change?", "What fails when the variance does not exist?"],
+  "tests": [], "validation_status": "manually_reviewed",
+  "source": "Original repository teaching fixture with an elementary reference derivation; not a formal proof certificate."
+}

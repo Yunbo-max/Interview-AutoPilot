@@ -1,0 +1,6 @@
+{
+  "kind": "event", "schema_version": "0.1.0", "session_id": "fictional-demo",
+  "event_id": "fictional-e1", "sequence": 1, "turn_id": "fictional-t1", "answer_revision": 2,
+  "type": "transcript_corrected", "host_time_ms": null,
+  "payload": {"fictional": true, "old_revision": 1, "new_revision": 2, "corrected_text": "The time complexity is O(n log n).", "reason": "Candidate corrected a transcription error; no audio exists in this fixture."}
+}

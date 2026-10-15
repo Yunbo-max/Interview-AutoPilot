@@ -1,0 +1,11 @@
+{
+  "kind": "judgment", "schema_version": "0.1.0", "assessment_id": "fictional-a1",
+  "turn_id": "fictional-t1", "question_id": "fictional-budget-comparison", "rubric_version": "1",
+  "answer_revision": 1, "status": "partial",
+  "finding": "The candidate states that total model calls were matched, but other budget controls are not established.",
+  "evidence": [{"source_id": "fictional-transcript", "locator": "turn fictional-t1, answer revision 1", "type": "answer", "observed": "Both variants used the same number of model calls."}],
+  "limitations": ["Synthetic example, not an observed interview.", "No experiment or code was inspected."],
+  "next_action": "probe",
+  "candidate_facing": "调用次数相同还不能说明 token 预算相同。两组的输入输出 token 总量是怎么控制的？",
+  "assistance_level": 0, "supersedes": []
+}

@@ -1,0 +1,32 @@
+{
+  "kind": "session_contract",
+  "schema_version": "0.1.0",
+  "session_id": "fictional-demo",
+  "contract_revision": 0,
+  "language": "zh-CN",
+  "mode": "strict",
+  "pressure": "challenging",
+  "duration_seconds": 3600,
+  "clock_mode": "user_managed",
+  "phases": [
+    {"id": "opening", "budget_seconds": 300},
+    {"id": "research", "budget_seconds": 1200},
+    {"id": "coding", "budget_seconds": 1200},
+    {"id": "mathematics", "budget_seconds": 600},
+    {"id": "closing", "budget_seconds": 300}
+  ],
+  "capabilities": {
+    "microphone": false, "audio_analysis": false, "speech_to_text": false,
+    "text_to_speech": false, "screen_capture": false, "camera": false,
+    "safe_code_execution": false, "symbolic_math": false,
+    "persistent_store": false, "continuous_timer": false
+  },
+  "consent": {
+    "microphone": false, "camera": false, "screen": false,
+    "cloud_audio": false, "cloud_materials": false,
+    "store_transcript": false, "store_audio": false, "store_video": false, "export": false
+  },
+  "consent_revision": 0,
+  "source_ids": [],
+  "notes": ["Fictional format fixture, not a consent receipt.", "Text-only target duration; no continuous clock is provided."]
+}

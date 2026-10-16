@@ -1,0 +1,2 @@
+# Tested adapter API version; install into a virtual environment.
+faster-whisper==1.2.1

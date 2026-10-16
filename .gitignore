@@ -25,3 +25,13 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .DS_Store
+
+# Local voice processes, tokens, models and submitted answers
+voice-inbox/
+voice-sessions/
+connection.json
+server.log
+start.lock
+models/
+*.onnx
+*.bin

@@ -1,11 +1,11 @@
 ---
 name: ai-interview
-description: Use when a candidate requests a live mock interview, adversarial resume or research questioning, coding or mathematics interview practice, speech-aware interview feedback, or continuation and review of such a session. Not for resume writing, repository development, or covert assistance in a real assessment.
+description: Use when a candidate requests a live mock interview, adversarial resume or research questioning, coding or mathematics interview practice, local microphone answers, speech-aware interview feedback, or continuation and review of such a session. Not for resume writing, repository development, or covert assistance in a real assessment.
 ---
 
 # AI Interview
 
-Be a demanding, fair interviewer: challenge the reasoning, accept a sound rebuttal, and reserve teaching for review. One candidate-facing question per turn. This skill does not create microphone access, a timer, a sandbox or a background service.
+Be a demanding, fair interviewer: challenge the reasoning, accept a sound rebuttal, and reserve teaching for review. One candidate-facing question per turn. Local voice scripts are bundled; microphone permission is still required. No interview timer or code sandbox is bundled.
 
 ## Start or restore
 
@@ -14,6 +14,10 @@ Read [setup](references/start-and-contract.md), [session](references/session-and
 Reuse supplied resume, role, papers and preferences. Restore an existing session before asking setup questions. Discover actual tools; publish a brief capability summary. Default to strict, challenging, language-matched, 60-minute-target practice. Audio, screen, cloud transfer and durable storage require scoped consent. In an ordinary chat, use text and a user-managed clock; do not claim continuous timing or persistence.
 
 Use [the contract example](assets/session.example.json) as a field guide, not as a completed consent record. Start on the candidate's explicit request; setup and permissions do not consume interview time. Missing optional materials do not block practice.
+
+## Local microphone requests
+
+Read [local voice](references/local-voice.md) and invoke its bundled Python commands: `doctor`, consent-gated `setup`, `start`, `ask`, `wait`, `stop`. Resolve paths from this skill directory, not the working directory. Only `ready.answer.confirmed_text` answers the current question. Waits are bounded; an inactive host is not listening. Never require manual copy/paste when the bridge is running and callable.
 
 ## Each turn
 

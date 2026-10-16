@@ -1,5 +1,6 @@
 # AI Interview: complete skill design v0.1.0
 
+> 0.2.0 adds the local microphone bridge described in [its specification](superpowers/specs/2026-10-16-local-voice-bridge.md). Broader voice/timer contracts below remain design requirements, not implementation claims. See [new verification](VOICE-VERIFICATION.md).
 Design date: 2026-10-15. Status: instructions and interfaces specified; live runtime not implemented.
 
 ## Intent and success criteria

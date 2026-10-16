@@ -16,3 +16,9 @@ Checked 2026-10-15. External APIs and packaging rules can change; runtime adapte
 | [SymPy assumptions](https://docs.sympy.org/latest/guides/assumptions.html) | Symbolic results depend on assumptions; unknown is distinct from false. |
 
 No existing third-party interview skill was copied into this package. Cross-examination policy, examples, reference tasks and data contracts are original design content. No current model ID, price, subscription entitlement, hiring statistic or employer-specific interview claim is hard-coded.
+
+## Local voice integration (checked 2026-10-16)
+
+- [Codex skills](https://developers.openai.com/codex/skills/): script/resource packaging and local skill discovery.
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper): local CPU model invocation; runtime requirement remains pinned to 1.2.1.
+- [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia): browser permission and secure-context requirements.

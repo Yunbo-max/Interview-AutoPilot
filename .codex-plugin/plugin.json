@@ -1,7 +1,7 @@
 {
   "name": "ai-interview",
-  "version": "0.1.0",
-  "description": "Adversarial mock interviews with fair challenges and evidence-based review. Skills-only; no bundled audio runtime.",
+  "version": "0.2.0",
+  "description": "Evidence-grounded mock interviews with bundled local microphone-to-text scripts for Codex. Text mode remains portable; voice requires local execution and browser consent.",
   "skills": "./skills/",
   "interface": {
     "displayName": "AI Interview",

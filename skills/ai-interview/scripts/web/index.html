@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI Interview · 本地语音输入</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main>
+<header><div class="eyebrow">AI INTERVIEW / LOCAL INPUT</div><h1>说出答案，确认文字。</h1><p>本机麦克风 → 本地 Whisper → 你确认后的文本。由 Codex 提问，你确认后再交给面试官。</p></header>
+<section class="notice"><strong>录音由你控制</strong><p>点击“开始录音”后才申请麦克风。结束会关闭麦克风；音频不由本工具写入磁盘。只有点击“确认并保存”才保存文本。确认文本可由正在等待的本地 Codex 读取；使用在线模型时文本会进入模型上下文。音频不发送到云端转写。</p></section>
+<section class="card"><span class="small" id="question-id"></span><h2>当前问题</h2><p id="question">等待 Codex 提问；独立模式可直接录音。</p></section>
+<section class="card"><div class="row"><label>主要语言 <select id="language"><option value="auto">自动识别</option><option value="zh">中文（可含英文术语）</option><option value="en">English</option></select></label><span id="timer" aria-live="off">00:00 / 03:00</span></div>
+<p id="status" role="status" aria-live="polite">正在检查本地服务…</p>
+<div class="buttons"><button id="start" disabled>开始录音</button><button id="stop" disabled>结束并转写</button><button id="cancel" disabled class="quiet">取消录音</button><button id="retry" disabled class="quiet">重试转写</button></div>
+<p class="small">每段最多 3 分钟；支持多轮录音。不是边说边出字，也不做语调/情绪评分。录音时不要播放面试官语音。</p></section>
+<section class="card"><label class="title" for="text">核对你的回答</label><p class="small">重点检查模型名、数字、否定词、公式。可以编辑，再提交给面试官。</p><textarea id="text" rows="9" placeholder="录音转写会显示在这里；本页刷新后未保存内容会丢失。" spellcheck="false"></textarea>
+<div class="buttons"><button id="copy" disabled class="quiet">复制文字</button><button id="save" disabled>确认答案，交给 Codex</button></div>
+<pre id="receipt"></pre><details><summary>原始转写（未核实）</summary><pre id="raw"></pre></details></section>
+<footer id="info"></footer><p class="small">此工具的转写不调用云端 API。将文字交给在线 Codex 后，适用 Codex 的数据处理方式。浏览器、系统交换内存和备份不由本工具控制。</p>
+</main></body></html>

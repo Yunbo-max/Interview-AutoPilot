@@ -1,29 +1,25 @@
 # Host adapters and installation
 
-## Skills-only mode available from this package
+## Portable interview rules
 
-The entire `ai-interview/` directory must travel together. In Codex, place it under a supported `.agents/skills/` location, then explicitly invoke `$ai-interview`. This release also includes portable root `plugin.json` and a Codex compatibility manifest. It does not register a remote server, deploy a service or install into an account automatically. Host discovery and behavior still require a smoke test in the chosen host.
+Copy the entire `ai-interview/` directory into the host's skill discovery path. In local Codex, use `.agents/skills/` or `~/.agents/skills/`, then explicitly invoke `$ai-interview`. The supplied plugin manifests are distribution metadata; they do not install a service or grant device permission. Text mode remains available without speech dependencies.
 
-Plain chat can apply the interview rules through available text/file tools. No mounted microphone, persistent storage or clock is assumed. A resume supplied in that chat is not permission to search unrelated connected files.
+Official sources: [Codex skills](https://developers.openai.com/codex/skills/), [plugin packaging](https://developers.openai.com/plugins/build/plugins), [Agent Skills format](https://agentskills.io/specification).
 
-Official sources: [Codex skill discovery](https://developers.openai.com/codex/skills/), [plugin packaging](https://developers.openai.com/plugins/build/plugins), [Agent Skills format](https://agentskills.io/specification). Consult them again before changing installation metadata.
+## Implemented local voice adapter (0.2.0)
 
-## Future local runtime: recommended adapter
+For microphone requests, read [local voice](local-voice.md) and call [voice.py](../scripts/voice.py). Commands: doctor, setup, start, ask, wait, status and stop. The browser acquires candidate-authorized audio. The local model transcribes; the candidate confirms; the waiting Codex shell call receives corrected text. The same Codex session remains the interviewer. This is a shell tool integration, not an automatically registered MCP tool and not an App Server implementation.
 
-A browser handles the candidate's input and an explicit submission control. A local controller owns the session clock, state and tool permissions. Speech-to-text feeds a canonical text turn to the interviewer; TTS speaks only the approved interviewer reply. Acoustic analysis reads authorized raw audio independently. Start turn-based; full-duplex is a separate acceptance gate.
+Installation alone does not start recording, install dependencies or download weights. `setup --allow-download` is the explicit network step. Serving uses locally cached weights. No separately billed speech API is required by this adapter. Online Codex model processing is separate from local transcription.
 
-Codex App Server is an integration option for a custom interactive client: initialize the connection, start/resume a thread, stream turns and handle approvals/interruptions. App Server has its own protocol; it is not interchangeable with an MCP server. Map a session ID to the actual returned thread ID, and persist it only with consent. Recheck the installed protocol version rather than copying sample fields forever. [Official App Server documentation](https://developers.openai.com/codex/app-server/).
+The host must support local process execution, loopback networking and bounded repeated tool calls. A cloud shell is not the user's desktop. Ask for ordinary host permission when required; never bypass a sandbox or tunnel the token-bearing local endpoint. No UI inspection in this environment proves that the candidate's device works.
 
-An alternative agent API can implement the same logical contracts. No specific paid provider or model is required by this skill. Do not promise a subscription covers separate speech/model API usage. Set explicit cost/rate/concurrency budgets during runtime setup, fail clearly when they are exhausted, and never invent pricing.
+## Broader runtime still not implemented
 
-## Media integration
+The bridge is not a full-duplex interview controller or exact one-hour clock. Codex App Server remains an optional future custom-client integration: initialize, start/resume a thread, stream turns, handle approvals and interruptions. It is not interchangeable with MCP. Recheck [the protocol](https://developers.openai.com/codex/app-server/) before implementing.
 
-Browser microphone access requires consent and a secure context; screen capture needs explicit user selection. See [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) and [getDisplayMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia). These APIs do not implement the interview engine or guarantee compatibility in every browser.
+Browser device permission comes from [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia). A future screen adapter must use [getDisplayMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia) with explicit consent. Neither implies raw media is exposed to the reasoning model.
 
-STT outputs differ by model. Probe transcript finalization, alignment, timestamps and supported confidence outputs; unavailable metadata remains unavailable. [Realtime transcription](https://developers.openai.com/api/docs/guides/realtime-transcription).
+Cloud STT is not used by the bundled bridge. Future alternatives need separate data-transfer approval and current provider limits. A product session length must not be confused with provider connection lifetime.
 
-A one-hour product session is independent of any provider connection lifetime. The Realtime conversation documentation checked on 2026-10-15 specifies a 60-minute session maximum: reserve reconnection margin and carry the controller state across a fresh connection rather than resetting the interview. Treat that limit as provider-specific, not universal. [Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations).
-
-## Optional checkers
-
-An audio adapter may use [librosa pYIN](https://librosa.org/doc/latest/generated/librosa.pyin.html) for voiced pitch estimates; estimates are not emotion labels. A math adapter may use [SymPy assumptions](https://docs.sympy.org/latest/guides/assumptions.html) for bounded symbolic checks; no simplification does not mean false. Neither dependency nor adapter is bundled as a working runtime here.
+Optional future checkers include [librosa pYIN](https://librosa.org/doc/latest/generated/librosa.pyin.html) for acoustic estimates and [SymPy assumptions](https://docs.sympy.org/latest/guides/assumptions.html) for bounded symbolic checks. Neither is a bundled working speech-assessment or proof-certification service.

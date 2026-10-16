@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ai-interview",
-  "version": "0.1.0",
-  "description": "Evidence-grounded adversarial mock interviews: resume cross-examination, coding, mathematics and capability-gated speech feedback. Skills-only design release."
+  "version": "0.2.0",
+  "description": "Evidence-grounded mock interviews with bundled local microphone-to-text scripts for Codex. Text mode remains portable; voice requires local execution and browser consent."
 }

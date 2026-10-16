@@ -1,5 +1,6 @@
 # Verification and acceptance
 
+> 0.2.0 adds the local microphone bridge described in [its specification](superpowers/specs/2026-10-16-local-voice-bridge.md). Broader voice/timer contracts below remain design requirements, not implementation claims. See [new verification](VOICE-VERIFICATION.md).
 ## Three independent levels
 
 **D: design/package checks.** Validate metadata, all relative references, contract schema, example records, privacy defaults, phase-budget sum, absent-audio guards, malformed inputs and sample reference code. Run `python -m unittest discover -s tests -v`. This proves only the checked artifacts and reference behavior.

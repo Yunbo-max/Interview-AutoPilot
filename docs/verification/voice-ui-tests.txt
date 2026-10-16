@@ -1,0 +1,2 @@
+PASS: 8 simulated UI/media-state assertions (not real browser/ASR)
+PASS: 15 simulated bridge/UI assertions (not real browser/ASR)

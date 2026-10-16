@@ -1,52 +1,67 @@
-# AI Interview 0.3.0 · 语音主导的多岗位模拟面试
+# AI Interview 0.4.0 · 简历、岗位、语音面试与前沿知识追踪
 
-**先上传 PDF 简历，再选岗位和模型，然后开启 60 分钟目标的真实对抗式面试。** 非 Coding 题由浏览器语音朗读，你对着麦克风回答（本机 Whisper 转文字、校对后才提交）；Coding 题提供网页编辑器，提交代码文本但不执行不受信任的程序。数学题可以语音解释，也可用文本补充公式。严格面试结束后查看模型生成的复盘和参考解；数学/代码尚无独立自动判题认证。
+我们的目标不是做另一个自动投递简历工具，而是**让技术人才持续准备真正有难度、紧贴岗位要求和最新研究进展的面试**。
 
-## 运行方式（macOS / Linux）
+新工作流：**`/profile → /scrape → /rank → /interview → /memory`**。独立的 `/trends` 用于更新岗位相关论文和技术热点。保留 0.3.0 的本地语音网页、六类岗位、一小时目标阶段规划和七种模型适配方案。
+
+## 五个主要入口
+
+| 命令 | 功能 | 重要边界 |
+|---|---|---|
+| `/profile` | 读取简历 PDF/文本，形成私人的、可编辑 Markdown CV 草稿；可在明确同意后让模型润色 | 未证明真实经历的内容不会自动当成事实，也不会自动提交 CV |
+| `/scrape` | 提供 LinkedIn 招聘搜索链接，或读取 Greenhouse/Lever 企业公开招聘 API；可导入用户指定的 JD | **不自动爬取 LinkedIn，不登录或绕开反爬**，不控制鼠标申请 |
+| `/rank` | 依据岗位、JD、简历实际内容做可解释的相关性排序 | 分数是简单启发式匹配，不是录取率或求职成功概率 |
+| `/interview` | 上传 CV、选择岗位/可选 JD、语音问答、Coding 编辑器、HR 对抗、技术深挖 | 语音在本机处理；模型仍可能通过网络处理你确认的内容；代码不执行 |
+| `/memory` | 保存你明确同意的历次面试覆盖情况及知识点证据，提醒哪些知识应重新验证 | **半年没练习不是“失去能力”**；没有证据必须再测，而不是直接扣分 |
+
+`/trends` 是支持命令：从 **arXiv** 获取有发表日期和抓取日期的论文元数据、摘要，或从 **Hugging Face Daily Papers** 获取社区推荐信号。它不是简单把六个月前的新闻冒充今天的前沿，也不把热门度当科学证据。最新研究材料只在你选择允许之后进入技术面试追问；**HR/简历轮不被论文新闻打断**。
+
+## 三类不同的“知识状态”
+
+- **基本原理已经证明掌握**：例如 Transformer Attention 的计算机制，历史回答有足够的具体证据。
+- **需要再测**：上一次给出有证据的回答距今很久，系统安排新题检查；这不是失去能力的断言。
+- **领域发生新变化**：检索到了有出处、日期的新论文/技术，再针对基线、缺陷、实验、公平性追问；摘要不等于完整论文审阅。
+
+这样 AI Researcher 的数学和架构基础与对最新 Attention/RL 论文的了解会被分开评估；Quant 会重点看统计、随机过程及金融领域相关研究；Agent Engineer 的工具协议、Harness、规划与评测变化频繁，可更短周期复练。
+
+## 本地开始使用（Mac / Linux）
 
 ```bash
 git clone https://github.com/Yunbo-max/AI-Interview.git
 cd AI-Interview
 python3 -m venv .venv && source .venv/bin/activate
 python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
-python skills/ai-interview/scripts/interview_studio.py doctor
-# 只想试上传 PDF、角色和文字输入，可不安装语音：
-python skills/ai-interview/scripts/interview_studio.py serve --without-stt
+
+# 建立简历资料；生成待人工检查的 Markdown CV 草稿
+python skills/ai-interview/scripts/career.py profile --resume /你的私有目录/CV.pdf --role ai_researcher
+
+# 产生 LinkedIn 搜索链接（不自动抓取 LinkedIn）
+python skills/ai-interview/scripts/career.py scrape --linkedin "LLM Agent Engineer" --location London
+
+# 企业公开招聘数据（替换为真实公司 board 名称）
+python skills/ai-interview/scripts/career.py scrape --greenhouse company-slug
+# 或：python skills/ai-interview/scripts/career.py scrape --lever company-slug
+
+# 岗位排序与研究更新
+python skills/ai-interview/scripts/career.py rank --role ai_researcher
+python skills/ai-interview/scripts/career.py trends --role ai_researcher --source arxiv
+
+# 语音面试网页（无 Whisper 时可先用文字输入）
+python skills/ai-interview/scripts/career.py interview --without-stt
 ```
 
-启用真正的本地麦克风转写（需主动允许依赖/模型下载）：
+要使用本地麦克风转文字，请额外安装 `skills/ai-interview/scripts/requirements-voice.txt`，明确授权下载 Whisper 模型，并运行 `python skills/ai-interview/scripts/career.py interview`。浏览器逐轮朗读非 Coding 题；你按麦克风按钮回答，确认转写再提交。Coding 仍在编辑器输入。
 
-```bash
-python -m pip install -r skills/ai-interview/scripts/requirements-voice.txt
-python skills/ai-interview/scripts/interview_studio.py download-model --allow-download --model base
-python skills/ai-interview/scripts/interview_studio.py serve --model base
-```
+面试设置页现在可以选取 `/scrape` 缓存的具体 JD，还可以点击 **Refresh research** 主动获取本岗位最新论文元数据；勾选允许新论文/已记录知识证据进入提问。面试结束后的 **Save private memory summary** 完全是可选操作，仅保存阶段覆盖和数量，不自动永久保存完整问答。
 
-浏览器打开终端打印的**完整私有 127.0.0.1 链接**。录音只在你点击 Record 且同意浏览器麦克风授权后开始；浏览器的 `speechSynthesis` 朗读题目，可以 Replay / Mute，也可以在不支持声音时查看文字。不会自动录屏或开启摄像头。原始 PDF 和音频不由本程序写盘；报告只有你点击导出才下载。模型仍可能通过网络处理 CV/文字，开始前需明确同意。
+## 需要理解的限制
 
-## 六种岗位
+**关于 LinkedIn**：目前公开条款不允许未经授权的爬虫或机器人自动化访问。因此 `/scrape --linkedin` 只生成你自己浏览的搜索链接，真实抓取使用 Greenhouse/Lever 官方公开职位接口，或者导入你手动选好的 JD。我们不宣传它能稳定爬完整 LinkedIn。
 
-| 岗位 | 主要覆盖 |
-|---|---|
-| Quant Research / Trader | HR/简历 15m + 概率统计随机过程 20m + Python 15m + 策略回测 10m |
-| Quant Developer | HR 15m + LeetCode 20m + 系统性能 15m + 金融基础 10m |
-| ML Engineer | HR 15m + Coding 15m + ML/实验 20m + MLOps 10m |
-| AI Researcher | HR/论文 15m + Transformer 15m + RL/生成模型 15m + 科研实验设计 15m |
-| LLM / Agent Engineer | HR 15m + Coding 15m + Transformer 10m + Agent Harness/Memory/MCP 20m |
-| Generative AI Researcher | HR/论文 15m + 数学 10m + Diffusion/Flow/DiT 25m + 科研设计 10m |
+**关于 CV**：默认草稿保留来源文字；使用 `--polish-with codex|claude|gemini|qwen|deepseek|glm|kimi --allow-model-transfer` 可选择让外部模型起草更整洁的 Markdown，但其事实必须人工审核，不能保证导出精确版式的 PDF。
 
-时间是目标阶段安排；真实本地计时只在服务运行期间有效，明确暂停和模型响应等待不计入。若进程退出，当前仅内存的会话不会自动恢复。
+**关于模型**：Codex、Claude Code、Gemini CLI 需要本地安装和登录；Qwen、DeepSeek、GLM、Kimi 需要对应 API Key。未经实机验证的接入不能宣称全部联调成功。不使用 Hermes Agent。
 
-## 七种模型/宿主
+**关于隐私**：用户资料默认保存在 `~/.local/share/ai-interview/`，不上传 GitHub。技术论文刷新会访问公开研究服务，但不会附带用户简历。将确认文本和所选 JD 交给在线模型，需要显式同意。原始音频不会由应用主动写盘。
 
-**本地 CLI Host：** Codex（`codex exec`）、Claude Code（`claude --print`）、Gemini CLI（`gemini --prompt`），须自己先安装并登录。**模型 API：** Qwen（`DASHSCOPE_API_KEY`）、DeepSeek（`DEEPSEEK_API_KEY`）、GLM（`ZAI_API_KEY`）、Kimi（`MOONSHOT_API_KEY`）。API Key 设置在启动程序的终端环境中，不放在网页里；服务地址固定，不允许用户任意指定 URL。不同服务需要自己开通额度或订阅，不是同一张 ChatGPT 订阅自动覆盖。
-
-> Codex、Claude Code、Gemini 可把整个 `skills/ai-interview/` 作为标准 Skill 安装，或者仅使用这个独立网页（无需 CLI 自动安装 Skill）。Codex/Gemini 用户可放 `~/.agents/skills/ai-interview/`，Claude Code 可放 `~/.claude/skills/ai-interview/`；不要只复制 SKILL.md，随包脚本和静态网页缺一不可。
-
-这个版本**没有 Hermes Agent**。同一个被选中的模型负责全程动态追问，依据你最新回答挑战，而不是机械题库。
-
-## 如何理解验证范围
-
-自动测试验证了课程总时长、简历上传、会话状态、各种模型协议请求形状、服务器鉴权、语音网页/编辑器模拟流程及旧版语音桥接回归。无法在当前环境验证你的真实麦克风、真实 Whisper 推理、七家已登录账号、浏览器 TTS 发声质量或连续交互一小时。不要把模型生成的参考答案视为经过代码沙箱/数学证明器认证。
-
-[英文 README](README.md) · [Skill 入口](skills/ai-interview/SKILL.md) · [Studio 运行说明](skills/ai-interview/references/voice-first-studio.md)
+**关于验证**：程序提供离线自动回归测试；真实 arXiv/HF/Greenhouse/Lever 网络响应、真实麦克风、模型账号和一小时稳定性需要在你的机器上再验证。详见 [验证报告](docs/CAREER-VERIFICATION.md) 与 [Skill 调用说明](skills/ai-interview/references/career-workflow.md)。

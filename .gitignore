@@ -35,3 +35,13 @@ start.lock
 models/
 *.onnx
 *.bin
+
+# Optional user-controlled career workspace (keep private even if placed under repo)
+career-workspace/
+profile.json
+jobs.json
+papers.json
+memory.json
+cv_draft.md
+cv_draft_*.md
+interview_report*.json

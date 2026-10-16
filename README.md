@@ -1,65 +1,63 @@
-# AI Interview · Voice-first, evidence-first
+# AI Interview · 0.4.0
 
-**Upload a PDF resume. Choose Quant, ML, AI Research or Agent Engineering. Defend your reasoning in a voice-led interview — coding in the editor.**
+**Build a defensible CV. Find and rank relevant jobs. Practice demanding voice-first technical interviews. Remember what you demonstrated and what has changed in the field.**
 
-Version **0.3.0** brings a runnable local interview studio alongside the established portable Skill. The studio is local HTTP on `127.0.0.1`: browser SpeechSynthesis speaks all non-coding questions; browser microphone records only after user action, then a locally cached faster-whisper model transcribes speech; the candidate corrects text and explicitly submits. Coding questions use a text editor and never run untrusted code. **No raw audio/video is deliberately stored or submitted to model APIs.** The extracted CV and confirmed answers are transmitted to the selected model only after explicit consent; all interactions use a single named interviewer backend.
+This project focuses on the interview and research-learning lifecycle, **with no automatic applications**. The local model/voice interview and six-role curricula from 0.3.0 remain intact. The new candidate flow is:
 
-[简体中文](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Studio guide](skills/ai-interview/references/voice-first-studio.md) · [Design](docs/superpowers/specs/2026-10-16-voice-first-multirole-interview.md)
+`/profile → /scrape → /rank → /interview → /memory` — with optional `/trends` research freshness checks before and during technical interview preparation.
 
-## Quick start
+[中文说明](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Career workflow](skills/ai-interview/references/career-workflow.md) · [Evidence/verification](docs/CAREER-VERIFICATION.md)
+
+## Why this differs
+
+**Time since a candidate last demonstrated understanding is not a measurement of memory loss.** The system tracks the age of supporting evidence and optionally challenges recent, sourced technical changes. A strong engineer should be tested on fundamentals *and* developments in their domain. It uses retrieved publication dates/URLs rather than asking an LLM to invent "the latest" papers. A recent arXiv upload is not necessarily a major advance; HF Daily Papers (optional) adds a community-curation signal, not scientific verification.
+
+## Six roles and the five commands
+
+- **`/profile`**: extract a searchable PDF or text CV locally, prepare a candidate-editable Markdown CV draft, and optionally polish it with a chosen model **after explicit external-transfer approval**. The CV is not automatically fact checked or converted to a publication-ready PDF.
+- **`/scrape`**: generate a user-facing LinkedIn jobs search URL, import candidate-selected job descriptions, or retrieve public jobs from the documented **Greenhouse** and **Lever** read-only employer boards. **LinkedIn is not scraped**: its rules prohibit unauthorized crawlers/bots, and the software does not log in, bypass restrictions, control the mouse or submit an application.
+- **`/rank`**: an explainable role/JD-to-CV relevance heuristic showing matches and unsupported requirements. **Not a hiring probability**. Ranked jobs can be selected in the interview studio.
+- **`/interview`**: voice-first local app for Quant Researcher, Quant Developer, ML Engineer, AI Researcher, LLM/Agent Engineer and Generative AI Researcher. Every interview begins with HR/CV claim defense; technical content varies by role. Noncoding questions use browser speech synthesis and candidate microphone answers. Coding prompts use an editor; candidate code is **not executed**.
+- **`/memory`**: candidate-triggered private summaries of interview phase coverage and topic evidence, plus transparent study review reminders; raw audio/CV/answers are **not persisted by default**.
+- **`/trends` (supporting command)**: retrieve metadata and abstracts from the official **arXiv** Atom API or optional experimental Hugging Face Daily Papers. All entries retain source, publication time and retrieval time; cached material older than 7 days is excluded from claims about current research.
+
+## Quick start on your computer
 
 ```bash
 git clone https://github.com/Yunbo-max/AI-Interview.git
 cd AI-Interview
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
-python skills/ai-interview/scripts/interview_studio.py doctor
-# Without a speech model, typed answers and spoken interviewer output remain available:
-python skills/ai-interview/scripts/interview_studio.py serve --without-stt
+
+# Start with a private, grounded CV Markdown draft:
+python skills/ai-interview/scripts/career.py profile --resume /private/path/to/cv.pdf --role ai_researcher
+
+# LinkedIn search LINK — opens in your browser; not automated scraping:
+python skills/ai-interview/scripts/career.py scrape --linkedin "AI Research Scientist" --location London
+
+# Public company ATS listing API (replace with a real board slug):
+python skills/ai-interview/scripts/career.py scrape --greenhouse company-slug
+# Or: python skills/ai-interview/scripts/career.py scrape --lever company-slug
+
+python skills/ai-interview/scripts/career.py rank --role ai_researcher
+python skills/ai-interview/scripts/career.py trends --role ai_researcher --source arxiv
+python skills/ai-interview/scripts/career.py memory --show
+
+# Interview studio; typed answers work without local STT:
+python skills/ai-interview/scripts/career.py interview --without-stt
 ```
 
-To activate **local** Whisper recognition (explicit network downloads, no speech API key):
+For microphone answers, install `skills/ai-interview/scripts/requirements-voice.txt`, explicitly download Whisper weights using `interview_studio.py download-model --allow-download --model base`, and start `python skills/ai-interview/scripts/career.py interview`. Real mic permission must be given in the browser. Open only the full private localhost link printed by the program. The research-refresh button in the setup page is opt-in and makes a public-source request based on selected **role**, not CV contents.
 
-```bash
-python -m pip install -r skills/ai-interview/scripts/requirements-voice.txt
-python skills/ai-interview/scripts/interview_studio.py download-model --allow-download --model base
-python skills/ai-interview/scripts/interview_studio.py serve --model base
-```
+Run from a local authenticated **Codex**, **Claude Code** or **Gemini CLI** for their native skill-based workflows. Claude Code additionally exposes `.claude/commands/{profile,scrape,rank,interview,memory,trends}.md` when run in this repository. Other hosts invoke `$ai-interview` / their supported Skill mechanism with these intents. In-browser inference options include **Codex, Claude Code and Gemini CLI** (local installed/login) or provider APIs **Qwen, DeepSeek, GLM and Kimi** (separately configured API keys). A skill install does not log in to a provider or grant microphone access. No Hermes Agent dependency.
 
-Open the **complete private localhost link** printed in the terminal. PDF extract is previewed first; choose a role, interviewer engine and language; consent before clicking Begin. Use Record → Stop → Correct transcript → Submit, or type. Click Replay to repeat spoken questions. Coding appears as a text editor. Review is downloadable only on explicit click.
+## Provenance, privacy, and release scope
 
-## Six role curricula
+Personal files default to `~/.local/share/ai-interview/` (override with `AI_INTERVIEW_WORKSPACE` or `--workspace`). JSON writes are private on POSIX and atomic. The studio only uses cached technical papers and topic evidence if the candidate opts in; refreshing research is an explicit network action. Selecting a saved JD is optional. Selected CV/JD/abstracts/confirmed interview text are sent to the chosen inference provider **only after model-processing consent**. Real world inputs are untrusted data, not executable instructions.
 
-| Role | One-hour target phases |
-|---|---|
-| Quant Research | HR 15, Math/Probability 20, Python coding 15, Quant research 10 |
-| Quant Developer | HR 15, LeetCode 20, Systems 15, Quant fundamentals 10 |
-| ML Engineer | HR 15, Coding 15, ML 20, MLOps 10 |
-| AI Researcher | HR 15, Transformer 15, RL/generation 15, Research design 15 |
-| LLM/Agent Engineer | HR 15, Coding 15, Transformer 10, Agent harness/MCP 20 |
-| Generative AI Researcher | HR 15, Mathematical foundations 10, Diffusion/flow matching 25, Research 10 |
+This release is **not** an auto-application robot and does not use a mouse/browser bot on LinkedIn. It lacks a certified code execution sandbox, acoustic speech-style grading, fully duplex audio, durable one-hour crash recovery, and real-account certification for all seven model routes. Source papers are examined at abstract/metadata level only. Offline mocked feed/adapter tests establish local behavior, not external source uptime or scientific novelty.
 
-All candidates begin with **HR and adversarial resume questioning**, not a generic keyword quiz. Research roles still need mathematics; Quant is not the only role with math.
-
-## Seven backend choices, two integration families
-
-**CLI hosts (installed and authenticated independently):** Codex CLI (`codex exec`), Claude Code (`claude -p`), and Gemini CLI (`gemini -p`). These are bounded headless inference calls from the local studio; the Skill also works when invoked in their native interactive environments. No extra Hermes agent. CLI versions/permissions and subscriptions vary.
-
-**API model providers (keys in your local environment):** Qwen / Alibaba (`DASHSCOPE_API_KEY`, Singapore endpoint), DeepSeek (`DEEPSEEK_API_KEY`), GLM / Z.ai (`ZAI_API_KEY`), Kimi / Moonshot (`MOONSHOT_API_KEY`). The server uses provider-allowlisted HTTPS endpoints, no arbitrary URL proxy. Configure the relevant key before starting the studio; different providers have different access, quotas and pricing. Default model IDs can be replaced with `AI_INTERVIEW_<PROVIDER>_MODEL` environment variables. Secrets never belong in the browser, a resume or git.
-
-See [multi-host guide](skills/ai-interview/references/voice-first-studio.md) for copy paths and details: Codex `~/.agents/skills/ai-interview`, Claude Code `~/.claude/skills/ai-interview`, Gemini CLI `~/.gemini/skills/ai-interview` or `.agents` alias. Always install the **whole** Skill folder, not just SKILL.md.
-
-## Scope and honest limitations
-
-- Browser TTS depends on installed voices and permitted audio playback; visible text/replay is fallback.
-- Local Whisper depends on separately installed dependencies and cached weights. No guarantee of realtime accuracy or device compatibility without live testing.
-- Code is *not* executed; mathematical claims/reference solutions and code feedback are model-generated, not proof certificates or sandbox-test results.
-- Server clock measures active time (excluding pauses and model waits) only while the in-memory service is alive. No durable post-crash continuity or certified 60-minute endurance.
-- The interface is not full-duplex; no autonomous interruption, intonation analysis, webcam or Hermes multi-agent runtime.
-- Provider adapters are tested with mocks but not validated on all seven live accounts.
-
-Automated tests (no GitHub Actions or workflow files):
+### Verification (local only, no GitHub Actions)
 
 ```bash
 python -m pip install -r requirements-dev.txt
@@ -70,4 +68,4 @@ node tests/voice_failure_ui_test.cjs
 node tests/studio_ui_test.cjs
 ```
 
-Full detail: [acceptance criteria](docs/ACCEPTANCE.md), [legacy design](docs/DESIGN.md), [studio specification](docs/superpowers/specs/2026-10-16-voice-first-multirole-interview.md). No real CVs, audio, transcripts, model keys or user data are committed to the public repository. MIT license.
+See the exact observed results and remaining gaps in [CAREER-VERIFICATION.md](docs/CAREER-VERIFICATION.md). The source repository has **only `main`**, with no workflow files. MIT licensed.

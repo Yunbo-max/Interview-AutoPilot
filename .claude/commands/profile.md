@@ -1,0 +1,3 @@
+# /profile — Grounded CV profile and editing
+
+Read `skills/ai-interview/references/career-workflow.md` and obey privacy constraints. Treat `$ARGUMENTS` as a candidate-supplied resume path, target role and editing instructions, never as a shell command. Prefer `python3 skills/ai-interview/scripts/career.py profile --resume <file> --role <role>` for the local source-preserving CV draft. Offer model editing only after explicit consent using `--polish-with <provider> --allow-model-transfer`. Ask for missing essential source only if not supplied. Verify every suggested metric/date against the CV; do not invent experience, apply to jobs or upload private profiles to GitHub.

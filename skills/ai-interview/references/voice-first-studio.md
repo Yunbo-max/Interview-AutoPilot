@@ -1,4 +1,4 @@
-# Voice-first studio: role-specific PDF interview
+# Voice-first studio: role-specific PDF interview and sourced research
 
 The preferred path when the candidate asks for a voice-led mock interview with PDF, role-specific questions and a coding editor. This is an executable *local application* bundled in the Skill, not a remote ChatGPT microphone connector. The entire `skills/ai-interview` directory must be installed with `scripts/` and `studio_web/` intact.
 
@@ -48,3 +48,16 @@ The installed Skill itself remains compatible with interactive local Codex, Clau
 Provider failure retains the current question and text for retry. Each answer submission carries question ID and idempotency ID; stale answer cannot become the next answer. If model or internet is not available, do not fabricate a successful answer. The program never directly runs candidate code, accepts arbitrary model URL from the browser, or uploads raw audio to a cloud speech API. The HTTP bridge and localhost token are private; do not expose the port publicly, post the link, or upload candidate PDFs/transcripts to GitHub.
 
 Browser autoplay may refuse speech synthesis; click Replay or read the question. Avoid opening a remote port-forward/tunnel to provide mic input. Realistic speech latency, STT accuracy, interruption and all provider accounts require testing on the candidate's machine. At server restart the in-memory session is lost; export the report explicitly before exiting.
+
+
+## 5. Career workflow and dated research extension (0.4.0)
+
+The studio stays primarily an interview application. The private, canonical career records are controlled by [the career workflow](career-workflow.md) and the bundled `scripts/career.py`:
+
+- `/profile` creates a private CV source and editable draft separately from uploading a PDF to the interview session. Uploading a PDF to the studio still does **not** automatically persist your full CV.
+- `/scrape` stores candidate-selected job descriptions or published Greenhouse/Lever company postings. The setup page queries `/api/jobs`, shows a list of imported JDs, and includes only an explicitly selected JD in interviewer prompts after model-processing consent. It does **not** crawl LinkedIn or make job applications.
+- Before beginning the interview, candidates can click **Refresh research for role**. The local server performs an explicit limited HTTPS retrieval from an allowlisted arXiv/HF source using role filters, without transmitting CV or candidate answers. It reports count/source/date, never inventing a successful result. No automatic refresh happens when the page loads.
+- Opt-in checkboxes `Use newly retrieved research` and `Use my local memory` gate these contexts separately. Currentness is determined from source publication/retrieval dates; if the feed is stale or unavailable, no 'latest paper' claim is permitted. Research/memory enter only non-HR technical question prompts; candidate memory age is not proof of forgetting.
+- At review, **Save private memory summary** explicitly writes a compact record of session role, phase coverage, answer count, elapsed seconds and *unverified-model* evidence label. The raw transcript/CV/recording is not part of that summary. The JSON review export remains separately optional and does include the answered exchanges when the candidate chooses it.
+
+The review-memory API has no effect until the user explicitly clicks the button; it does not repeatedly save on page refresh. An external model still processes the selected context after the candidate consents; private local storage is distinct from online inference provider processing.

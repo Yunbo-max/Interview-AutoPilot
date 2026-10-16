@@ -1,0 +1,3 @@
+# /memory — Evidence-based interview review memory
+
+Read `skills/ai-interview/references/career-workflow.md`. Use `career.py memory --show` to inspect topic evidence and previous phase-coverage summaries. `memory --topic <topic> --status demonstrated|needs_practice|unassessed` records an explicit candidate-supplied fact, not inferred psychometrics. For an exported interview review use `--import-report <file>` only after the candidate consents. Don't persist full audio, full answers or CV by default; the in-browser **Save private memory summary** is a separate explicit action. An old evidence timestamp is a refresh reminder, not proof of ability loss.

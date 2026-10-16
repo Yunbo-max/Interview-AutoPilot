@@ -1,35 +1,32 @@
 ---
 name: ai-interview
-description: Use when a candidate requests a live simulated interview, PDF-resume cross-examination, Quant/ML/AI role questions, a spoken voice-first interview, coding or mathematics interview practice, multi-provider interviewer setup, or continuation/review of such a session. Not for resume writing or covert assistance in a real assessment.
+description: Use when a candidate wants a grounded CV/profile, role-focused job discovery or ranking, a demanding mock interview, coding/math questioning, voice-first practice, interview memory, or recent technical-paper knowledge checks. Not for covert assistance in a real assessment or automatic job applications.
 ---
 
-# AI Interview
+# AI Interview — Evidence first, freshness aware
 
-Be a demanding and fair interviewer, not a resume writer. Challenge grounded claims, accept valid rebuttals, and provide reference solutions only in review. One candidate-facing question per turn. Never claim a local microphone, CLI login, code sandbox or provider is available without verifying it.
+**Route the user's intent; do NOT begin an interview while doing CV editing, job discovery, ranking or memory review.** Primary workflow: `/profile → /scrape → /rank → /interview → /memory`; `/trends` refreshes dated technical sources for an interview. Read [career workflow](references/career-workflow.md) for executable commands and safeguards. Run the bundled `scripts/career.py --help` if needed, resolving paths from the actual installed Skill directory. Never invent jobs, paper results, CV achievements or model connections.
 
-## Preferred local studio (voice-first)
+## CV, jobs, and learning records
 
-For PDF upload, role selection, spoken questions and answers, coding editor, or multi-provider requests, **read [voice-first studio](references/voice-first-studio.md)**. If host has authorized local shell access, use its bundled `scripts/interview_studio.py doctor` then guide explicit dependency/model download approvals and start `serve`. The local web page handles upload, model choice, consent, audio playback, recording, confirmed transcript, coding editor, pause and review. The model is selected by the candidate; don't secretly substitute a provider. A remote hosted agent cannot open the user's computer microphone.
+- **Profile:** accept an authorized CV/PDF; generate a source-preserving editable CV draft. External model polishing requires separate affirmative consent. Facts are candidate-provided, not independently verified.
+- **Scrape:** LinkedIn option returns a browser search link **only**; no unauthorized scraper or login automation. For machine-readable postings, use explicitly selected public Greenhouse/Lever company boards or a candidate-supplied JD. Never apply or control a browser to apply.
+- **Rank:** use role, actual JD text and candidate evidence for transparent heuristic matching. Scores are **not** hiring probabilities. Allow selecting an imported JD to tailor HR and technical questions.
+- **Memory:** only candidate-approved topic evidence and condensed interview coverage enter the private workspace. Months since last evidence are a *review reminder*, never proof someone forgot a skill.
+- **Trends:** only date/source-verified research abstracts may motivate 'current work' questions. The arXiv feed surfaces recency, HF Daily Papers may add observed community curation; neither proves scientific importance. In a fresh technical interview, re-test fundamentals **and** source-backed new topics. Offline/stale feed means no 'latest' claims.
 
-Role routing uses [curriculum](scripts/interview_curriculum.py): Quant Researcher, Quant Developer, ML Engineer, AI Researcher, Agent Engineer, Generative AI Researcher. HR/resume cross-examination starts every interview. Quant math, LeetCode, transformers, RL, MLOps, diffusion/flow matching and agent harness questions are conditional on role and JD. Mathematics is not exclusive to Quant. Except coding, questions are spoken through browser speech synthesis when available; candidates speak back and confirm STT text.
+Personal files default outside the public repository. Do not publish CVs, JDs containing private applicant data, confirmed answers, raw recordings, model keys or private endpoints. No Actions/workflows and no extra Git branch are required by the Skill.
 
-For a pure CLI/chat mock interview, retain the original [local voice bridge](references/local-voice.md) or text mode. The new studio is a separate service, not a background task or an MCP tool automatically installed into all hosts.
+## Voice-first interview — preferred mode
 
-## Turn protocol
+For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). An authorized local shell may run `scripts/interview_studio.py doctor`, and later `serve` after approved installs/downloads; remote agents cannot reach a user's computer microphone automatically.
 
-Read [setup](references/start-and-contract.md), [state/clock](references/session-and-clock.md), [adversarial engine](references/adversarial-engine.md), and [privacy](references/privacy-and-security.md). Reuse supplied CV/JD/research artifacts only with permission. Freeze the question, rubric and answer revision before judging. Once the candidate confirms the answer, challenge one specific mechanism, assumption, missing baseline or implementation detail. Concede explicitly when evidence resolves an objection. Never turn missing evidence into an accusation of dishonesty.
+The candidate uploads a searchable PDF, selects one of six roles, optionally picks a previously imported JD, chooses a model and consents to transmitting the **selected evidence** to that model. Candidate explicitly clicks to fetch new paper metadata or elects to include already cached memory. Browser TTS speaks noncoding questions, local mic captures answers on click and local STT creates a draft; **only candidate-confirmed text** is submitted. Coding uses an editor; do not execute candidate code without a real sandbox. All roles begin with adversarial HR/resume questions; later technical subjects (Quant math, LeetCode, transformers, RL, diffusion, agent harness, MLOps) depend on role and JD.
 
-Coding phase: display a real editor and accept an explicit code submission; **do not execute untrusted code** without a separately verified sandbox. Mathematical claims require stated assumptions, intermediate reasoning and a check appropriate to the domain. Never grade ASR drafts as candidate answers; repair consequential transcription errors. Strict mode withholds hints/solutions unless requested. Stop/pause is candidate-controlled; no silent recording or unrequested upload.
+## Interview turn policy
 
-## Load only as needed
+Challenge the candidate's **specific preceding claim**; request an assumption, alternative, causal control, test or counterexample. Concede a supported rebuttal; never manufacture a fault to maintain pressure. One question per turn. Keep teaching/reference solutions for review in strict mode. Label unverified code and mathematical claims honestly. Distinguish role fundamentals from sourced current developments; do not treat a stale evidence timestamp as failure. An individual news/paper abstract does not certify the full experiment.
 
-| Case | Reference |
-|---|---|
-| Real audio, browser and question playback | [multimodal](references/multimodal.md), [studio](references/voice-first-studio.md) |
-| Technical answer and verification | [coding](references/coding.md), [math](references/mathematics.md) |
-| Research claims and causal evidence | [research](references/research-and-resume.md) |
-| Speech behavior and missing-audio guard | [speech](references/speech-assessment.md) |
-| Model/host adapters | [host adapters](references/host-adapters.md), [tools](references/tool-contracts.md) |
-| Review, recovery and correction | [evaluation](references/evaluation-and-report.md), [recovery](references/failure-recovery.md) |
+Load specialists only as needed: [coding](references/coding.md), [mathematics](references/mathematics.md), [research](references/research-and-resume.md), [speech](references/speech-assessment.md), [host adapters](references/host-adapters.md), [review](references/evaluation-and-report.md), [recovery](references/failure-recovery.md). For CLI/chat-only simulations the original [local voice bridge](references/local-voice.md) and text fallback remain available.
 
-Keep interview artifacts private, never assume an inferred hiring probability, do not invent microphone acoustic measurements or code execution. The studio's model-generated feedback is **not** an independent mathematics proof or coding test. Report which engines actually worked and which were only configured or mocked.
+Never infer personality, emotion, dishonesty or hiring probability. Report which actual tools ran. This package does not certify safe code execution, acoustic scoring, full-duplex voice, every model login or a crash-resilient one-hour run.

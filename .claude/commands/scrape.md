@@ -1,0 +1,3 @@
+# /scrape — Role search and verified job import
+
+Read `skills/ai-interview/references/career-workflow.md`. Use `$ARGUMENTS` only to determine requested role, location, company board or user-supplied description. For LinkedIn generate a browser search link with `career.py scrape --linkedin ...`; **do not automate LinkedIn scraping**. For explicitly supplied Greenhouse or Lever company boards use the documented read-only API via `career.py scrape --greenhouse <slug>` or `--lever <slug>`. Import user-provided JD content with `--import-description` and explicit role/company/HTTPS URL. A candidate must verify posting status. Never auto-apply or request site passwords.

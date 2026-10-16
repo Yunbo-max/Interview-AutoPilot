@@ -40,12 +40,18 @@ function setProviderInfo(){
 async function init(){
   if(!token){notice('Missing local access token. Open the complete private URL printed in your terminal.');return;}
   try{
-    const [meta,health,state]=await Promise.all([api('/api/providers'),api('/api/health'),api('/api/state')]);
+    const [meta,health,state,jobs]=await Promise.all([api('/api/providers'),api('/api/health'),api('/api/state'),api('/api/jobs')]);
     context.roles=meta.roles;context.providers=meta.providers;context.voiceReady=health.speech_ready;
     el('role').replaceChildren(...meta.roles.map(r=>new Option(r.label,r.id)));
     el('provider').replaceChildren(...meta.providers.map(p=>new Option(`${p.id.toUpperCase()} ${p.configured?'✓':'· setup needed'}`,p.id)));
+    el('job-target').replaceChildren(new Option('General role interview (no selected JD)',''),
+      ...(jobs?.jobs||[]).map(j=>new Option(`${j.company} — ${j.title}`,j.id)));
+    el('job-note').textContent=(jobs?.jobs||[]).length
+      ? `${jobs.jobs.length} imported job(s) available. Select one to ground the HR and technical questions.`
+      : 'No imported JDs yet. Use /scrape to add one, or continue with a general interview.';
     const first=meta.providers.find(p=>p.configured);if(first)el('provider').value=first.id;
     context.role=el('role').value;phasePills(context.role);setProviderInfo();
+    await refreshEvidence();
     if(!context.voiceReady){el('voice-info').textContent='Local Whisper is unavailable. Type your response below, or install model weights and restart.';notice('Local speech recognition not loaded. Text mode remains available.');}
     if(state.status!=='setup'){
       context.session=state;context.role=state.role;context.provider=state.provider;
@@ -54,7 +60,27 @@ async function init(){
     }
   }catch(e){notice('Unable to reach local interview service: '+e.message);}
 }
-el('role').addEventListener('change',()=>{context.role=el('role').value;phasePills(context.role);});
+async function refreshEvidence(){
+  if(!el('role').value)return;
+  try {
+    const result=await api('/api/evidence-summary?role='+encodeURIComponent(el('role').value));
+    el('evidence-note').textContent=`Cached for this role: ${result.recent_papers} recent source items, ${result.memory_topics} evidence topics. Nothing is fetched automatically. Older material is excluded from current-research questions.`;
+  } catch(e) {
+    el('evidence-note').textContent='Could not inspect the local research cache. Current-paper claims will not be assumed.';
+  }
+}
+el('role').addEventListener('change',()=>{context.role=el('role').value;phasePills(context.role);refreshEvidence();});
+el('refresh-research').addEventListener('click',async()=>{
+  if(context.busy)return;
+  setBusy(true);notice('Retrieving dated paper metadata from the selected public research source…');
+  try {
+    const result=await jsonPost('/api/trends-refresh', {role:el('role').value,source:el('trend-source').value||'arxiv'});
+    await refreshEvidence();
+    el('include-trends').checked=true;
+    notice(`${result.count} research records fetched. The latest papers will be considered in technical rounds; the model has NOT read the full papers.`);
+  } catch(e){notice('Research refresh failed: '+e.message+'. No new paper claims will be invented.');}
+  finally{setBusy(false);}
+});
 el('provider').addEventListener('change',setProviderInfo);
 el('consent').addEventListener('change',()=>setBusy(context.busy));
 el('mute').addEventListener('change',()=>{context.muted=el('mute').checked;if(context.muted && 'speechSynthesis'in window)window.speechSynthesis.cancel();});
@@ -77,7 +103,9 @@ el('begin').addEventListener('click',async()=>{
   setBusy(true);notice('Preparing your interviewer…');
   try{
     const question=await jsonPost('/api/start',{role:el('role').value,provider:el('provider').value,
-      consent:el('consent').checked,focus:el('focus').value,language:el('language').value});
+      consent:el('consent').checked,focus:el('focus').value,language:el('language').value,
+      use_trends:el('include-trends').checked,use_memory:el('include-memory').checked,
+      job_id:el('job-target').value||null});
     context.role=el('role').value;context.provider=el('provider').value;
     show('session');renderQuestion(question);notice('Strict interview started. Use your microphone or the text fallback.');
   }catch(e){notice(e.message);}
@@ -216,6 +244,15 @@ function renderReview(data){
   el('reference-solutions').textContent=data.reference_solutions || 'Reference solutions unavailable; no independent verification performed.';
   if(!(data.history||[]).length){const p=document.createElement('p');p.textContent='No submitted answers yet.';body.appendChild(p);}
 }
+el('save-memory').addEventListener('click',async()=>{
+  if(context.busy || !context.session || context.session.status!=='completed') return;
+  setBusy(true);
+  try {
+    await jsonPost('/api/save-memory',{confirm:true});
+    notice('A minimal evidence summary was saved in your private workspace. No answer transcript was copied.');
+  } catch(e) { notice('Could not save interview memory: '+e.message); }
+  finally { setBusy(false); }
+});
 el('download-review').onclick=()=>{
   if(!context.session)return;
   const blob=new Blob([JSON.stringify(context.session,null,2)],{type:'application/json'});

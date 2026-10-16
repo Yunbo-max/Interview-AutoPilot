@@ -1,0 +1,3 @@
+# /trends — Recent research evidence for technical interviews
+
+Read `skills/ai-interview/references/career-workflow.md`. Retrieve cited arXiv recent metadata with `career.py trends --role <role> --source arxiv` on explicit request; optionally try the public HF Daily Papers curation source. Report publication date, retrieval date and URL for each item, and distinguish newness, popularity, technical importance and proven experimental improvement. Never invent articles, paper results or exact dates, or claim that an abstract is a full-paper verification. If a feed fails or is stale, say so. Recent papers can form interview challenges, but foundational theory must still be assessed separately.

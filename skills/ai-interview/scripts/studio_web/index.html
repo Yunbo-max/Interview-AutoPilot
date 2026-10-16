@@ -28,6 +28,9 @@
         <h2>Choose your path.</h2>
         <label for="role">TARGET ROLE</label><select id="role" aria-label="Target role"></select>
         <div id="role-phases" class="phase-preview"></div>
+        <label for="job-target">SPECIFIC JOB / JD (OPTIONAL)</label>
+        <select id="job-target"><option value="">General role interview (no selected JD)</option></select>
+        <p id="job-note" class="smallnote">Import a public posting with /scrape, then return here to target that job.</p>
         <label for="language">INTERVIEW LANGUAGE</label><select id="language"><option value="zh" selected>中文 / Chinese</option><option value="en">English</option></select>
         <label for="focus">SPECIALIZATION / JD HINT (OPTIONAL)</label><input id="focus" maxlength="300" placeholder="e.g. Diffusion architecture, systematic trading...">
       </section>
@@ -35,8 +38,16 @@
         <div class="step-index">03 / YOUR INTERVIEWER</div>
         <div class="config-grid">
           <div><h2>Select a model.</h2><p>Local CLI hosts or provider APIs. Installed CLI or API key required; using online models sends your confirmed responses and resume text to that provider.</p><label for="provider">INTERVIEW ENGINE</label><select id="provider"></select><p id="provider-note" class="smallnote"></p></div>
-          <div class="consent-stack"><label class="checkrow"><input type="checkbox" id="consent"><span>I consent to sending extracted resume text and confirmed answers to the selected model provider during this interview.</span></label>
+          <div class="consent-stack"><label class="checkrow"><input type="checkbox" id="consent"><span>I consent to sending extracted resume text, confirmed answers, and any selected JD, research abstracts and memory evidence to the chosen model provider during this interview.</span></label>
           <label class="checkrow"><input type="checkbox" id="mute"><span>Do not speak questions aloud (accessible text remains available).</span></label>
+          <label class="checkrow"><input type="checkbox" id="include-trends"><span>Use newly retrieved research papers to challenge my technical knowledge (not during HR).</span></label>
+          <label class="checkrow"><input type="checkbox" id="include-memory"><span>Use my locally recorded topic evidence to select revision questions (review due is not failure).</span></label>
+          <div class="research-refresh">
+            <label for="trend-source">RECENT RESEARCH SOURCE</label>
+            <select id="trend-source"><option value="arxiv">arXiv recent papers</option><option value="hf">Hugging Face Daily Papers (experimental)</option></select>
+            <button id="refresh-research" class="minimal" type="button">Refresh research for role ↻</button>
+            <p id="evidence-note" class="smallnote">Research is fetched only if you click Refresh. A new publication is not necessarily a breakthrough.</p>
+          </div>
           <p class="smallnote">Recording starts only when you press Record. Audio is decoded locally if Whisper is installed; audio is not deliberately saved. No camera or screen sharing.</p></div>
         </div>
         <button id="begin" class="primary big" disabled>ENTER INTERVIEW <span>↗</span></button>
@@ -67,7 +78,7 @@
     </div>
     <div class="submit-row"><p id="submit-hint" class="smallnote">Your answer is not sent until you click Submit.</p><button id="submit" class="primary">SUBMIT ANSWER <span>→</span></button></div>
   </section>
-  <section id="review" class="review-screen" hidden><div class="eyebrow">SESSION COMPLETE / 03</div><h1>Evidence,<br><em>not impressions.</em></h1><p>Questions and answers are shown below. Evaluations are model-generated, not independently certified; candidate code was not executed.</p><div id="review-body"></div><section class="review-entry"><strong>REFERENCE ANSWERS / 模型参考解</strong><pre id="reference-solutions"></pre></section><button id="download-review" class="primary">Export report JSON ↓</button></section>
+  <section id="review" class="review-screen" hidden><div class="eyebrow">SESSION COMPLETE / 03</div><h1>Evidence,<br><em>not impressions.</em></h1><p>Questions and answers are shown below. Evaluations are model-generated, not independently certified; candidate code was not executed.</p><div id="review-body"></div><section class="review-entry"><strong>REFERENCE ANSWERS / 模型参考解</strong><pre id="reference-solutions"></pre></section><button id="download-review" class="primary">Export report JSON ↓</button> <button id="save-memory" class="minimal">Save private memory summary (no raw answers)</button><p class="smallnote">This is optional. It saves role, answered phases and counts only, not the resume, audio or full transcript.</p></section>
   <p id="notice" role="status" aria-live="polite"></p>
   </main>
   <footer><span>AI INTERVIEW / OPEN SOURCE</span><span>LOCAL FIRST · VOICE FIRST · NO AUTOMATIC RECORDING</span></footer>

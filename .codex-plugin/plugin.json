@@ -1,7 +1,7 @@
 {
   "name": "ai-interview",
-  "version": "0.3.0",
-  "description": "Evidence-grounded mock interviews with bundled local microphone-to-text scripts for Codex. Text mode remains portable; voice requires local execution and browser consent.",
+  "version": "0.4.0",
+  "description": "Voice-first, evidence-based AI/Quant interview and local CV/job discovery, ranking, sourced research freshness and candidate memory. No automatic applications.",
   "skills": "./skills/",
   "interface": {
     "displayName": "AI Interview",

@@ -10,25 +10,32 @@ from pathlib import Path
 import secrets
 import sys
 import threading
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs, urlencode
+import xml.etree.ElementTree as ET
 import webbrowser
 
 from mic_stt import Handler as LocalHandler, AppState, MAX_AUDIO_BYTES
 from interview_core import InterviewSession, read_resume_pdf, MAX_CV_BYTES
 from interview_curriculum import ROLE_PLANS, ROLE_LABELS
 from interview_models import ModelRouter, PROVIDERS
+from career import (CareerWorkspace, briefing_for_role, memory_brief, topic_review_due, ROLE_TAGS,
+    get_public_bytes, arxiv_search_url, parse_arxiv_feed, parse_hf_daily, HF_BASE, utcnow)
 
 ROOT = Path(__file__).resolve().parent
 VERSION = '0.3.0'
 
 
 class StudioState(AppState):
-    def __init__(self, router=None, speech=None, token=None):
+    def __init__(self, router=None, speech=None, token=None, workspace=None):
         super().__init__(speech, Path.home()/'.cache/ai-interview/studio-unused',
                          token=token or secrets.token_urlsafe(32), model_name='optional local Whisper')
         self.router = router or ModelRouter()
         self.speech = speech
         self.interview = InterviewSession(self.router)
+        self.workspace = workspace if workspace is not None else CareerWorkspace()
+        self.research_lock = threading.Lock()
+        self.memory_save_lock = threading.Lock()
+        self.memory_saved = None
 
 
 class StudioHandler(LocalHandler):
@@ -40,6 +47,19 @@ class StudioHandler(LocalHandler):
             self.json(200,{'version':VERSION,'speech_ready':self.state.speech is not None,'audio_limit':MAX_AUDIO_BYTES,
                            'note':'Local-only HTTP server; model providers may send confirmed text externally'})
             return
+        if path=='/api/evidence-summary':
+            requested=parse_qs(urlsplit(self.path).query).get('role',[''])[0]
+            if requested not in ROLE_TAGS:
+                self.json(400,{'error':'Choose a supported role'});return
+            brief=briefing_for_role(self.state.workspace,requested)
+            memory=self.state.workspace.memory()
+            self.json(200,{'role':requested,'recent_papers':brief.count('\nsource: '),
+                 'memory_topics':len(topic_review_due(memory)),
+                 'note':'Cached-only: no live internet fetch. Age of evidence is not forgetting.'})
+            return
+        if path=='/api/jobs':
+            jobs=[{k:j.get(k) for k in ('id','title','company','location','source')} for j in self.state.workspace.jobs()[-100:]]
+            self.json(200,{'jobs':jobs});return
         if path=='/api/providers':
             self.json(200,{'roles':[{'id':r,'label':ROLE_LABELS[r],'phases':p} for r,p in ROLE_PLANS.items()],
                            'providers':self.state.router.availability()})
@@ -85,7 +105,7 @@ class StudioHandler(LocalHandler):
                 self.json(422,{'error':f'Local audio decoding failed ({type(exc).__name__}); you may type your answer'})
             finally:self.state.transcription_lock.release()
             return
-        if path not in ('/api/start','/api/answer','/api/pause','/api/resume-session','/api/finish'):
+        if path not in ('/api/start','/api/answer','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory'):
             self.json(404,{'error':'Not found'});return
         if self.headers.get('Content-Type','').split(';')[0].strip().lower()!='application/json':
             self.json(415,{'error':'JSON content required'});return
@@ -95,8 +115,51 @@ class StudioHandler(LocalHandler):
             data=json.loads(body)
             if not isinstance(data,dict):raise ValueError('Expected a JSON object')
             interview=self.state.interview
-            if path=='/api/start':
-                result=interview.start(data.get('role'),data.get('provider'),data.get('consent') is True,data.get('focus',''),data.get('language','zh'))
+            if path=='/api/save-memory':
+                if data.get('confirm') is not True:
+                    raise ValueError('Confirm saving a private memory summary')
+                if interview.status!='completed' or interview.finished_review is None:
+                    raise ValueError('Finish the interview before saving the summary')
+                with self.state.memory_save_lock:
+                    if self.state.memory_saved is None:
+                        self.state.memory_saved=self.state.workspace.record_session(interview.finished_review)
+                    result={'status':'saved','session_summary':self.state.memory_saved,
+                            'note':'Only coverage and counts saved, not your raw transcript or CV.'}
+            elif path=='/api/trends-refresh':
+                role=data.get('role');source=data.get('source','arxiv')
+                if role not in ROLE_TAGS or source not in ('arxiv','hf'):
+                    raise ValueError('Unsupported role or research source')
+                if interview.status != 'setup':
+                    raise ValueError('Research refresh is only available before starting the interview')
+                if not self.state.research_lock.acquire(blocking=False):
+                    raise ValueError('Research refresh already in progress')
+                try:
+                    if source == 'arxiv':
+                        url=arxiv_search_url(role,max_results=18)
+                        papers=parse_arxiv_feed(get_public_bytes(url),role)
+                    else:
+                        url=HF_BASE+'?'+urlencode({'date':utcnow().strftime('%Y-%m-%d'),'limit':18})
+                        papers=parse_hf_daily(json.loads(get_public_bytes(url)),role)
+                    if not papers:
+                        raise RuntimeError('No dated papers were returned. Research cache was not refreshed.')
+                    count=self.state.workspace.write_papers(papers)
+                    result={'status':'retrieved','source':source,'count':count,
+                            'source_url':url,'retrieved_at':utcnow().isoformat(),
+                            'notice':'Paper abstracts and dates only; not verified paper results.'}
+                finally:
+                    self.state.research_lock.release()
+            elif path=='/api/start':
+                role=data.get('role')
+                chosen_job=''
+                job_id=data.get('job_id')
+                if job_id:
+                    found=next((j for j in self.state.workspace.jobs() if j.get('id')==job_id),None)
+                    if found is None:raise ValueError('Selected job not found in the private workspace')
+                    chosen_job=f"Company: {found['company']}. Role: {found['title']}. URL: {found['url']}\n"+found['description'][:3300]
+                trend=briefing_for_role(self.state.workspace,role) if data.get('use_trends') is True and role in ROLE_TAGS else ''
+                history=memory_brief(self.state.workspace) if data.get('use_memory') is True else ''
+                result=interview.start(role,data.get('provider'),data.get('consent') is True,
+                      data.get('focus',''),data.get('language','zh'),trend_brief=trend,memory_brief=history,job_brief=chosen_job)
             elif path=='/api/answer':
                 result=interview.submit(data.get('question_id'),data.get('text'),data.get('kind'),data.get('submission_id'))
             elif path=='/api/pause':interview.pause();result=interview.public_state()
@@ -105,7 +168,7 @@ class StudioHandler(LocalHandler):
             self.json(200,result)
         except (ValueError,KeyError,TypeError) as exc:
             self.json(409,{'error':str(exc)})
-        except RuntimeError as exc:
+        except (RuntimeError,OSError,UnicodeError,ET.ParseError) as exc:
             self.json(502,{'error':str(exc)})
 
 

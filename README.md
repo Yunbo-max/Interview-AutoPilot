@@ -9,7 +9,7 @@
     <a href="README.zh-CN.md">简体中文</a>
   </p>
   <p>
-    <img alt="Version 0.7.0" src="https://img.shields.io/badge/version-0.7.0-234f3d?style=flat-square" />
+    <img alt="Version 0.8.0" src="https://img.shields.io/badge/version-0.8.0-234f3d?style=flat-square" />
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-234f3d?style=flat-square" />
     <img alt="Mac one-click setup" src="https://img.shields.io/badge/Mac-one--click_setup-a7d79f?style=flat-square" />
     <img alt="Local-first voice" src="https://img.shields.io/badge/voice-local--first-a7d79f?style=flat-square" />
@@ -62,7 +62,7 @@ VoiceStudio's packaged local backend requires an **Apple Silicon Mac with macOS 
 
 ### Timekeeper Agent · sensible time pressure, not arbitrary penalties
 
-A **separate deterministic local Timekeeper** now records question-by-question active seconds while the interviewer focuses on technical follow-ups. It does **not** call another LLM, listen for acoustic silence, open the microphone, auto-skip a question, or judge correctness from time taken. The browser displays a per-question clock alongside the existing 60-minute session clock, and can speak a short reminder when you are **not** recording.
+A **separate deterministic local Timekeeper** records question-by-question active seconds while the interviewer focuses on technical follow-ups. It does **not** call another LLM, open the microphone by itself, auto-skip a question, or judge correctness from time taken. The browser displays a per-question clock alongside the existing 60-minute session clock. During an unanswered **voice** question, it can speak a natural interviewer check-in ("Would you like me to repeat the question?") when no recording is active.
 
 | Question type | First reminder | Progress nudge | Offer to skip |
 | :--- | ---: | ---: | ---: |
@@ -71,7 +71,7 @@ A **separate deterministic local Timekeeper** now records question-by-question a
 | **Math / research / generative** | 2 minutes | 4 minutes | 6 minutes |
 | **Coding** | 5 minutes | 10 minutes | 15 minutes |
 
-You can explicitly **add one minute** (up to twice; suggested question pacing only), **skip without a negative assessment**, or **pause** the session. Local model inference and bound Whisper/VoiceStudio **transcription processing** are excluded from candidate active time. The total session still ends at 60 active minutes, with a warning at five and one minute remaining; the review includes a per-question timing ledger. **No submission is not the same as silence or a wrong answer.** A closed tab cannot receive an audible reminder—pause before leaving. [Timing contract and known limits](skills/ai-interview/references/timekeeper-agent.md).
+You can explicitly **add one minute** (up to twice; suggested question pacing only), **skip without a negative assessment**, or **pause** the session. Local model inference and bound Whisper/VoiceStudio **transcription processing** are excluded from candidate active time. The total session still ends at 60 active minutes, with a warning at five and one minute remaining; the review includes a per-question timing ledger. **New: candidate-triggered microphone silence checks.** Only after you click **Record**, the browser may monitor **approximate audio amplitude locally**; after roughly **40 seconds of low activity**, the interviewer asks if you need the question repeated or more time. While that prompt plays, the microphone track is temporarily muted to prevent the interviewer audio from entering your answer; it is restored or cancelled within a bounded time. This is not certified speech recognition or proof that you were silent: quiet voices and background noise can affect detection, and unsupported browsers simply keep the unanswered-question timer. No raw audio or sound levels are saved in the timing report; one bounded client-observed event per question may be logged. **No submission is not the same as silence or a wrong answer.** Mute and Coding modes remain silent; a closed tab cannot receive an audible reminder—pause before leaving. [Timing contract and known limits](skills/ai-interview/references/timekeeper-agent.md) · [Check-in design and tests](docs/INTERVIEWER-CHECKINS-VERIFICATION.md).
 
 ### Choose your track
 
@@ -128,7 +128,7 @@ AI-Interview separates **the interviewer** (reasoning) from **the voice** (speec
 - **Your resume, raw recording and unsubmitted text are not committed to GitHub.** PDF parsing is local; the interview page does not intentionally persist raw recordings. Persistent candidate workspace defaults to `~/.local/share/ai-interview/`.
 - **LLM calls are not automatically offline.** After explicit consent, the selected model provider receives confirmed answers and the chosen CV/JD/context. VoiceStudio can also be configured with optional remote engines; check its settings.
 - **No auto-applications or hidden interview assistance.** The app does not log in to LinkedIn, control a mouse, execute arbitrary candidate code, infer personality from speech or promise interruption-quality full duplex.
-- **Verification is scoped.** v0.7.0 passed 177 Python tests and six Node UI simulation suites; see the [Timekeeper verification](docs/TIMEKEEPER-VERIFICATION.md) for exact results. Mac installation, actual microphones, voice-model quality, all provider accounts and continuous one-hour sessions have **not** been certified on real devices.
+- **Verification is scoped.** v0.8.0 passed 177 Python tests and six Node UI simulation suites; see the [Timekeeper verification](docs/TIMEKEEPER-VERIFICATION.md) for exact results. Mac installation, actual microphones, voice-model quality, all provider accounts and continuous one-hour sessions have **not** been certified on real devices.
 
 [Installer verification](docs/ONE-CLICK-MAC-VERIFICATION.md) · [Voice bridge verification](docs/VOICESTUDIO-VERIFICATION.md) · [Career workflow verification](docs/CAREER-VERIFICATION.md) · [Source and research rules](docs/SOURCES.md)
 

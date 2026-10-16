@@ -300,6 +300,15 @@ class InterviewSession:
             self.receipts[submission_id]={**receipt,'_matching':signature}
             return receipt
 
+    def note_acoustic_checkin(self, qid):
+        """Log a candidate-side amplitude warning, without audio and without grading."""
+        with self.lock:
+            if (self.status!='active' or self.current_question is None or
+                    self.current_question['id'] != qid or self._host_waits):
+                raise ValueError('No active matching question for acoustic check-in')
+            event=self.timekeeper.note_local_acoustic_checkin(qid,self._clock.elapsed())
+            return {'status':'logged','event':event}
+
     def extend_question(self, qid):
         """Extend only recommended per-question pacing, never the 60-minute total."""
         with self.lock:

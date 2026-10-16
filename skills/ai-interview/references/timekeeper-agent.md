@@ -6,7 +6,7 @@ The interviewer model decides *what to ask* and challenges candidate evidence.
 `interview_timekeeper.py` owns *when to remind* and *what time to record*.
 It is called an "agent" because it has an independent event policy and timing
 ledger. **It is not a second LLM, background Codex call, hosted notification,
-or an acoustic silence detector.** Its reminders require no tokens or API key.
+or an always-on microphone detector.** Its reminders require no tokens or API key.
 
 The web server invokes `InterviewSession.pulse()` on every service loop even if
 no browser `/api/state` poll is received. The session uses `time.monotonic()`
@@ -27,8 +27,9 @@ first. A laptop sleep/device restart is not a certified recoverable session.
 The labels above mean **time since a question became active without a submitted
 answer**, not detected silence. Someone thinking, typing, talking into a
 microphone, or reviewing a draft is not automatically considered unable to
-answer or wrong. The browser does not speak reminders while recording or
-coding; it displays them visually. Pressing **+1 minute** pushes the final
+answer or wrong. For ordinary unanswered voice questions, the browser can speak a brief, natural **interviewer check-in** (not just elapsed-time narration). The scheduled check-in remains visual while recording or coding; no extra model call is used.
+
+**Separate voluntary microphone monitor (0.8.0):** Only after a candidate clicks Record, `studio_web/silence_monitor.js` samples local amplitude through a Web Audio analyser (never connected to output). Two consecutive above-threshold samples indicate activity and reset the approximate silence clock. At roughly 40 seconds of low activity, a once-only interviewer question is shown and, unless muted or unsupported, spoken. The microphone media track is temporarily disabled during this short system-voice prompt to avoid capturing the interviewer, then restored on completion/error/cancellation or a 12-second limit. Microphone silence is *approximate*, not speech content, and noise or quiet speaking can produce false readings; this feature cannot identify whether the candidate is thinking or struggling. The browser provides a replay button and +1 minute controls but never submits or grades a reply automatically. An optional client-observed check-in timestamp (one per active question) is recorded in `timing.turns[].acoustic_checkins` without audio or waveform levels. It is explicitly not independently verified silence. Without Web Audio, only the unanswered-question timer is used; no microphone starts automatically. Pressing **+1 minute** pushes the final
 *recommended* question time back by 60 seconds (at most twice). It **does not**
 change the entire interview's 60-minute active-time limit, and it does not
 silently discard the current answer draft.
@@ -62,7 +63,7 @@ whether STT machine processing is ongoing. `POST /api/extend-question` accepts
 bounded idempotency `submission_id`. Skips do not fabricate a candidate answer.
 
 The exported session review contains `timing.turns` with question ID, phase,
-kind, active duration, reminder events, extensions, UTC start/end, and
+kind, active duration, reminder/check-in events, extensions, UTC start/end, and
 `answered/skipped/unfinished/time_limit` outcome. The clock **is not a
 competence score**, hiring probability, or emotion/accent estimate. The
 private optional `/memory` summary still stores only condensed coverage/counts

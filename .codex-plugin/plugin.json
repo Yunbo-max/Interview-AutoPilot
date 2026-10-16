@@ -1,6 +1,6 @@
 {
   "name": "ai-interview",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Voice-first AI/Quant interviews, private career workflows, and an optional localhost VoiceStudio speech backend. No automatic applications.",
   "skills": "./skills/",
   "interface": {

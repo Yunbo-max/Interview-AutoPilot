@@ -48,6 +48,21 @@ def _question_message(level, seconds, language):
     return f'{waited} on this question, with no submission yet. Skip or continue thinking; this is not graded as wrong.'
 
 
+
+def _interviewer_checkin(level, language):
+    """One natural interviewer question, not an assessment or microphone claim."""
+    if language == 'zh':
+        return {
+            'gentle': '你还在思考这道题吗？需要我重复一下问题吗？',
+            'progress': '你愿意先讲讲目前想到哪一步，还是希望我澄清题意？',
+            'offer_skip': '这题要继续想一会儿，还是先跳过进入下一题？',
+        }[level]
+    return {
+        'gentle': 'Are you still thinking it through, or would it help if I repeated the question?',
+        'progress': 'Would you like to talk me through your approach so far, or should I clarify the question?',
+        'offer_skip': 'Would you like a little more thinking time, or should we move to the next question?',
+    }[level]
+
 def _session_message(seconds, language):
     remaining = max(0, SESSION_LIMIT-seconds)
     if language == 'zh':
@@ -74,6 +89,7 @@ class TimekeeperAgent:
             'question_id': question['id'], 'phase': question['phase'], 'kind': question['kind'],
             'started_at_utc': self.utc_source(), 'started_at_active_seconds': float(total_active_seconds),
             'base_thresholds': base, 'extensions_seconds': 0, 'reminders': [],
+            'acoustic_checkins': [],
         }
 
     def _thresholds(self, question):
@@ -96,6 +112,23 @@ class TimekeeperAgent:
             if elapsed >= threshold and not any(e['level'] == level for e in q['reminders']):
                 q['reminders'].append({'id':f'{q["question_id"]}:{level}', 'level':level,
                                        'at_seconds':threshold, 'observed_at_utc':self.utc_source()})
+
+    def note_local_acoustic_checkin(self, question_id: str, total_active_seconds: float):
+        """Store only a bounded client-supplied indicator, never audio or proof of silence."""
+        q=self.question
+        if q is None or q['question_id'] != question_id or q['kind']!='voice':
+            raise ValueError('No matching active spoken question for microphone check-in')
+        if q['acoustic_checkins']:
+            return dict(q['acoustic_checkins'][0])
+        event={
+            'question_id':question_id,
+            'at_active_seconds':int(max(float(total_active_seconds),q['started_at_active_seconds'])),
+            'observed_at_utc':self.utc_source(),
+            'source':'client_observed_approximate_low_microphone_activity',
+            'note':'Approximate local signal, not proof of silence or an answer score.',
+        }
+        q['acoustic_checkins'].append(event)
+        return dict(event)
 
     def extend(self, question_id: str):
         q = self.question
@@ -121,7 +154,8 @@ class TimekeeperAgent:
             'recommended_seconds':thresholds[-1], 'thresholds_seconds':thresholds,
             'extensions_seconds':q['extensions_seconds'],
             'reminders':[{
-                **e, 'message':_question_message(e['level'],e['at_seconds'],language)
+                **e, 'message':_question_message(e['level'],e['at_seconds'],language),
+                'checkin_prompt':_interviewer_checkin(e['level'],language)
             } for e in q['reminders']],
             'session_reminders':[self._session_event(e,language) for e in self.session_reminders],
             'note':'No acoustic silence detection. Unsubmitted is not incorrect.',
@@ -143,6 +177,7 @@ class TimekeeperAgent:
             'started_at_utc':q['started_at_utc'], 'ended_at_utc':self.utc_source(),
             'active_seconds':max(0,int(float(total_active_seconds)-q['started_at_active_seconds'])),
             'extensions_seconds':q['extensions_seconds'], 'reminders':list(q['reminders']),
+            'acoustic_checkins':list(q['acoustic_checkins']),
             'outcome':outcome,
         }
         self.turns.append(record)

@@ -37,6 +37,10 @@ Candidates choose role, PDF, JD and model; uploading to model and paper refresh 
 
 For a candidate who explicitly wants **VoiceStudio**, first read [VoiceStudio backend — install & use](references/voicestudio-backend.md). This AGPL-3.0 app is **separately installed**, not bundled. `scripts/career.py interview --doctor --voicestudio` checks its fixed loopback protocol; `scripts/career.py interview --voicestudio --without-stt` can use its TTS, real-time streaming partial subtitles (with optional `websockets` relay), and batch STT when available. VoiceStudio requires separate consent and a microphone click. Only summary finals become **editable drafts**. Retain browser/Whisper fallbacks; never expose tokens or automatically install VoiceStudio.
 
+## Natural interviewer check-ins
+
+The [Timekeeper](references/timekeeper-agent.md) may speak a short, local question after unanswered delays, or approximately 40 seconds of low microphone activity during **candidate-initiated** recording. Temporarily mute the mic while prompting; never grade silence, start recording automatically or submit the candidate's answer.
+
 ## Interview turn policy
 
 Use the local Timekeeper to track each question, gently remind at role-appropriate milestones, record explicit skips and avoid grading unsubmitted answers. It is a deterministic supervisor, **not** another LLM or speech-silence detector; do not invent elapsed times in chat-only mode.

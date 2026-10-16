@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 — Natural interviewer check-ins and opt-in-time microphone activity (2026-10-16)
+
+- Turned previous scheduled voice reminders into **natural interviewer questions** in the selected language (e.g. "Need me to repeat the question?") while keeping the deterministic 60-minute/time-per-question controller and no extra LLM calls.
+- Added an optional, local Web Audio RMS activity observer **only while a candidate actively records**. Following roughly 40 seconds of low microphone activity, a single short interviewer check-in is possible; quiet speech and background noise can affect it, and unsupported browsers fall back to unanswered-question reminders.
+- During audible check-in the mic track is temporarily muted and restored on speech completion/error/cancel or a bounded timeout, so AI speech isn't captured as a candidate answer. Replay while recording is blocked.
+- New authenticated, idempotent acoustic-checkin metadata endpoint records the time of an approximate **client-observed** event without storing audio, sound levels or inventing a skill score. Explicit candidate Submit remains mandatory.
+- Added focused mock-browser policy tests, HTTP integration tests and the new static asset. No always-on microphone, new hosted model, GitHub Actions or branches. Hardware mic tests remain outstanding.
+
 ## 0.7.0 — Per-question Timekeeper Agent, active-time pacing (2026-10-16)
 
 - Added an independent, deterministic local Timekeeper with active per-question timing and phase-specific advisory reminders (HR 1/2/5 minutes, coding 5/10/15, math/research 2/4/6).

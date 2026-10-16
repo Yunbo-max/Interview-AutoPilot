@@ -9,7 +9,7 @@
     <a href="README.md">English</a>
   </p>
   <p>
-    <img alt="Version 0.7.0" src="https://img.shields.io/badge/version-0.7.0-234f3d?style=flat-square" />
+    <img alt="Version 0.8.0" src="https://img.shields.io/badge/version-0.8.0-234f3d?style=flat-square" />
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-234f3d?style=flat-square" />
     <img alt="Mac one-click setup" src="https://img.shields.io/badge/Mac-one--click_setup-a7d79f?style=flat-square" />
     <img alt="Local-first voice" src="https://img.shields.io/badge/voice-local--first-a7d79f?style=flat-square" />
@@ -62,7 +62,7 @@ VoiceStudio 官方打包的本地后端要求 **Apple Silicon + macOS 13.3+**；
 
 ### Timekeeper Agent：会控场、但不乱扣分的计时监督器
 
-新增了**独立的本地确定性 Timekeeper**：面试官模型继续负责出题和追问，计时监督器只负责每道题的时长、分级提醒、暂停/跳过、总时间预算和可导出的时间记录。**它不额外调用 LLM，也不监听声音判断你是否“沉默”**；没有提交，不代表答错。只有录音结束、没有正在播放/录制语音时才可能朗读简短提醒；Coding 题只做视觉提醒。
+新增了**独立的本地确定性 Timekeeper**：面试官模型继续负责出题和追问，计时监督器只负责每道题的时长、分级提醒、暂停/跳过、总时间预算和可导出的时间记录。**它不额外调用 LLM，也不会自行打开麦克风**；长时间尚未提交语音回答时，面试官会主动问一句“你还在思考吗？需要我重复题目吗？”，而不仅是读出已用时几分钟。**在你自己点击 Record 之后**，网页还会通过本地 Web Audio 声音能量做近似检测：如果录音期间约 **40 秒持续低活动**，会自然地再询问一次。播报期间麦克风轨道临时静音，播完恢复，避免面试官的声音进入你的答案。此检测不能精确认定一个人“沉默”：环境噪声、轻声讲话和浏览器兼容性都会影响结果。只记录有限的客户端提示事件，不保存声音能量值或原始录音；**没提交答案或暂时安静不代表答错**。静音模式不会播报，Coding 题只显示文字。
 
 | 题型 | 第一次提示 | 第二次提示 | 建议考虑跳过 |
 | :--- | ---: | ---: | ---: |
@@ -71,7 +71,7 @@ VoiceStudio 官方打包的本地后端要求 **Apple Silicon + macOS 13.3+**；
 | **数学 / 科研 / 生成模型** | 2 分钟 | 4 分钟 | 6 分钟 |
 | **Coding** | 5 分钟 | 10 分钟 | 15 分钟 |
 
-你可以自己点击 **+1 minute**（每题最多两次，只延长该题*建议*时限）、**Skip question**（明确跳过、不评分），或者 **Pause** 暂停计时。面试总限额仍是 **60 分钟有效时间**，剩余五分钟、一分钟时提醒；等待面试官 LLM 和已经绑定题目的 Whisper/VoiceStudio **转写处理**不会计入答题时间。面试结束的 JSON 报告里会有每题真实有效用时。**关闭浏览器不等于自动暂停**，离开之前请点击 Pause。[具体时间规则](skills/ai-interview/references/timekeeper-agent.md)。
+你可以自己点击 **+1 minute**（每题最多两次，只延长该题*建议*时限）、**Skip question**（明确跳过、不评分），或者 **Pause** 暂停计时。面试总限额仍是 **60 分钟有效时间**，剩余五分钟、一分钟时提醒；等待面试官 LLM 和已经绑定题目的 Whisper/VoiceStudio **转写处理**不会计入答题时间。面试结束的 JSON 报告里会有每题真实有效用时。**关闭浏览器不等于自动暂停**，离开之前请点击 Pause。[具体时间规则](skills/ai-interview/references/timekeeper-agent.md) · [主动询问的测试说明](docs/INTERVIEWER-CHECKINS-VERIFICATION.md)。
 
 ### 六类岗位
 
@@ -126,7 +126,7 @@ VoiceStudio 官方打包的本地后端要求 **Apple Silicon + macOS 13.3+**；
 - **用户简历、录音、未提交的回答不会上传公开 GitHub。** PDF 本地解析，程序不主动持久保存录音；私人工作目录默认为 `~/.local/share/ai-interview/`。
 - **面试不一定完全离线。** 在你授权后，选择的 LLM 可能收到简历、JD 和确认回答；VoiceStudio 若选了远程引擎，也可能发送音频到外部服务。
 - **不会自动投递或辅助真实面试作弊。** 不登录 LinkedIn、不控制鼠标、不直接运行候选人代码，也不凭声音推断人格、情绪或能力。
-- **测试与实机效果要分开。** v0.7.0 的计时监督器、HTTP 与语音交互已完成 **177 项 Python 测试及六组网页模拟测试**；[见具体结果](docs/TIMEKEEPER-VERIFICATION.md)；真实 Mac、麦克风效果、不同模型账号以及完整一小时语音面试**尚未全部认证**。
+- **测试与实机效果要分开。** v0.8.0 的计时监督器、HTTP 与语音交互已完成 **177 项 Python 测试及六组网页模拟测试**；[见具体结果](docs/TIMEKEEPER-VERIFICATION.md)；真实 Mac、麦克风效果、不同模型账号以及完整一小时语音面试**尚未全部认证**。
 
 [一键安装验证](docs/ONE-CLICK-MAC-VERIFICATION.md) · [VoiceStudio 桥接验证](docs/VOICESTUDIO-VERIFICATION.md) · [求职流程验证](docs/CAREER-VERIFICATION.md) · [研究来源规范](docs/SOURCES.md)
 

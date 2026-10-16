@@ -23,7 +23,7 @@ from career import (CareerWorkspace, briefing_for_role, memory_brief, topic_revi
     get_public_bytes, arxiv_search_url, parse_arxiv_feed, parse_hf_daily, HF_BASE, utcnow)
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '0.7.0'
+VERSION = '0.8.0'
 
 
 class StudioState(AppState):
@@ -106,6 +106,7 @@ class StudioHandler(LocalHandler):
             self.json(200,self.state.interview.public_state());return
         assets={'/':('index.html','text/html; charset=utf-8'),
                 '/app.js':('app.js','application/javascript; charset=utf-8'),
+                '/silence_monitor.js':('silence_monitor.js','application/javascript; charset=utf-8'),
                 '/style.css':('style.css','text/css; charset=utf-8')}
         if path not in assets:self.json(404,{'error':'Not found'});return
         name,content_type=assets[path]
@@ -201,7 +202,7 @@ class StudioHandler(LocalHandler):
                 self.state.interview.end_host_wait(hold_token)
                 self.state.transcription_lock.release()
             return
-        if path not in ('/api/start','/api/answer','/api/skip','/api/extend-question','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory'):
+        if path not in ('/api/start','/api/answer','/api/skip','/api/extend-question','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory','/api/acoustic-checkin'):
             self.json(404,{'error':'Not found'});return
         if self.headers.get('Content-Type','').split(';')[0].strip().lower()!='application/json':
             self.json(415,{'error':'JSON content required'});return
@@ -211,7 +212,10 @@ class StudioHandler(LocalHandler):
             data=json.loads(body)
             if not isinstance(data,dict):raise ValueError('Expected a JSON object')
             interview=self.state.interview
-            if path=='/api/save-memory':
+            if path=='/api/acoustic-checkin':
+                if set(data) != {'question_id'}:raise ValueError('Only active question_id is accepted')
+                result=interview.note_acoustic_checkin(data['question_id'])
+            elif path=='/api/save-memory':
                 if data.get('confirm') is not True:
                     raise ValueError('Confirm saving a private memory summary')
                 if interview.status!='completed' or interview.finished_review is None:

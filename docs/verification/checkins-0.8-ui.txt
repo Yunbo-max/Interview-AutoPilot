@@ -1,0 +1,23 @@
+==== tests/silence_monitor_test.cjs ====
+PASS: acoustic silence policy, voice activity reset, once-only, invalid levels
+==== tests/studio_silence_ui_test.cjs ====
+PASS: natural check-in once, mic muted/restore on end or cancel, no auto-submit, teardown
+==== tests/studio_ui_test.cjs ====
+PASS: studio UI simulated resume, consent, TTS, voice and code turn
+==== tests/studio_voicestudio_ui_test.cjs ====
+PASS: VoiceStudio mocked streaming STT, confirmed-only answer, TTS, and coding transition
+==== tests/timekeeper_ui_test.cjs ====
+PASS: Timekeeper UI reminder once, no interruption, skip, extension, coding, review
+==== tests/ui_state_test.cjs ====
+PASS: 8 simulated UI/media-state assertions (not real browser/ASR)
+==== tests/voice_failure_ui_test.cjs ====
+PASS inactive_recorder_error_discards_final_data
+PASS oversized_final_chunk_is_not_silently_truncated
+PASS permission_resolving_after_pagehide_releases_without_recording
+PASS question_change_between_stop_and_callback_discards_audio
+PASS disconnect_between_stop_and_callback_discards_audio
+PASS confirmation_retries_reuse_id_but_edits_create_new_id
+PASS normal_stop_still_transcribes_once
+7 asynchronous UI scenarios, 0 failed (simulated media).
+==== tests/voice_ui_test.cjs ====
+PASS: 15 simulated bridge/UI assertions (not real browser/ASR)

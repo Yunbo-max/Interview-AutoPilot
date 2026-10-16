@@ -96,6 +96,28 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(state['history'][-1]['answer_elapsed_seconds'],60)
         self.assertEqual(state['timekeeper']['question_id'],nextq['id'])
 
+    def test_acoustic_checkin_requires_active_question_and_never_sends_audio(self):
+        route='/api/acoustic-checkin'
+        body=json.dumps({'question_id':'no-session'}).encode()
+        self.assertEqual(self.req('POST',route,body,{'Content-Type':'application/json'})[0],409)
+        with patch('interview_studio.read_resume_pdf',return_value='A real CV describing research and experiments'):
+            self.req('POST','/api/resume',self.pdf,{'Content-Type':'application/pdf'})
+        status,q=self.req('POST','/api/start',json.dumps({'role':'ai_researcher','provider':'codex','consent':True}).encode(),{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertEqual(self.req('POST',route,json.dumps({'question_id':'wrong'}).encode(),{'Content-Type':'application/json'})[0],409)
+        body=json.dumps({'question_id':q['id']}).encode()
+        status,first=self.req('POST',route,body,{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertEqual(first['status'],'logged')
+        self.assertEqual(self.req('POST',route,body,{'Content-Type':'application/json'})[1],first)
+        self.assertEqual(len(self.state.interview.timekeeper.question['acoustic_checkins']),1)
+        self.assertEqual(self.state.interview.history,[])
+        self.assertEqual(self.req('POST',route,body,{'Content-Type':'application/json'},auth=False)[0],403)
+        status,final=self.req('POST','/api/finish',b'{}',{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertEqual(len(final['timing']['turns'][0]['acoustic_checkins']),1)
+        self.assertEqual(final['timing']['answered_count'],0)
+
     def test_local_speech_decoding_wait_does_not_consume_candidate_time(self):
         now=[0.0]
         self.state.interview._clock.source=lambda:now[0]
@@ -138,6 +160,16 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(review['timing']['turns'][0]['outcome'],'time_limit')
         self.assertEqual(review['timing']['unanswered_count'],1)
         self.assertNotIn('My resume',str(review['timing']))
+
+    def test_silence_monitor_is_public_static_code_not_private_data(self):
+        status,text=self.req('GET','/silence_monitor.js',auth=False)
+        # Static asset access requires the app's Origin and Host check; it must
+        # contain no candidate data. The authenticated request is the normal UI path.
+        self.assertIn(status,(200,403))
+        status,source=self.req('GET','/silence_monitor.js')
+        self.assertEqual(status,200)
+        self.assertIn(b'function rmsFromBytes',source)
+        self.assertNotIn(b'candidate CV',source)
 
     def test_upload_rejects_other_content(self):
         self.assertEqual(self.req('POST','/api/resume',b'hello',{'Content-Type':'application/pdf'})[0],400)

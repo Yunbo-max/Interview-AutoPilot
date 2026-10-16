@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <title>AI Interview — defend your reasoning.</title>
-<link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+<link rel="stylesheet" href="/style.css"><script src="/silence_monitor.js" defer></script><script src="/app.js" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -55,7 +55,7 @@
             <button id="refresh-research" class="minimal" type="button">Refresh research for role ↻</button>
             <p id="evidence-note" class="smallnote">Research is fetched only if you click Refresh. A new publication is not necessarily a breakthrough.</p>
           </div>
-          <p class="smallnote">Recording starts only when you press Record. Audio is decoded locally if Whisper is installed; audio is not deliberately saved. No camera or screen sharing.</p></div>
+          <p class="smallnote">Recording and local acoustic activity checks start only when you press Record. Audio is decoded locally if Whisper is installed; audio is not deliberately saved. No camera or screen sharing.</p></div>
         </div>
         <button id="begin" class="primary big" disabled>ENTER INTERVIEW <span>↗</span></button>
       </section>
@@ -71,7 +71,7 @@
       <section class="timekeeper-panel" aria-label="Local timekeeper supervision">
         <div class="timekeeper-header"><span class="step-index">LOCAL TIMEKEEPER · NO EXTRA LLM</span><strong id="question-elapsed" class="tabnums">00:00 / 05:00 GUIDE</strong></div>
         <div class="timekeeper-track"><div id="question-progress"></div></div>
-        <div class="timekeeper-footer"><p id="timekeeper-note" aria-live="polite">The clock measures time since the question was asked, not microphone silence. Your thinking time is not a score.</p><div class="timekeeper-actions"><button id="more-time" class="minimal" type="button">+1 minute</button><button id="skip-question" class="minimal" type="button">Skip question ↗</button></div></div>
+        <div class="timekeeper-footer"><p id="timekeeper-note" aria-live="polite">The interviewer will check in after long unanswered intervals; optional local microphone-silence detection runs only while recording. No silence is scored as wrong.</p><div class="timekeeper-actions"><button id="more-time" class="minimal" type="button">+1 minute</button><button id="skip-question" class="minimal" type="button">Skip question ↗</button></div></div>
       </section>
     </div>
     <div class="answer-layout">

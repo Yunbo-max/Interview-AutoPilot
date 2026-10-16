@@ -1,0 +1,17 @@
+# Interviewer check-ins: voice-first pacing (0.8.0)
+
+The ordinary interview model remains the **only** substantive interviewer. The local deterministic `TimekeeperAgent` does not ask an external LLM for time updates. When an active voice question has gone unanswered at its role-specific threshold (HR 1m, LLM 90s, mathematics 2m, etc.), it emits a **natural check-in question** (ZH/EN), which the browser can read aloud when it is not recording, paused, busy, muted, coding, editing a draft or already playing audio. No answer is submitted by a check-in; the candidate retains Replay, +1 minute, Skip and Pause controls.
+
+## Active microphone input
+
+The browser **never** opens a microphone for detection. Only after a candidate clicks **Record**, if the browser provides Web Audio, a 1024-byte-domain-sample amplitude analyser runs on the approved media stream at 500ms intervals. No graph connection to speaker output and no raw audio/levels are stored in interview history. Two consecutive above-threshold RMS samples reset the local *low-activity* interval; an observer may issue **one** interviewer check-in per recording after about 40 seconds of no confirmed above-threshold activity. This is a heuristic, not a language-level VAD, and **does not prove silence**. Background noise may suppress a nudge; whispering can cause a premature nudge. AudioContext blocked/suspended/unsupported -> no acoustic event; unanswered-question reminders still function.
+
+To prevent VoiceStudio/Whisper treating the spoken interviewer as the candidate, the recorder's audio tracks are temporarily `enabled=false` while browser speech synthesis asks the question, and restored after the `end`/`error` event or 12-second bound. Stopping, muting, changing the question or closing the page tears down the analyser and ends/aborts pending audio. Question Replay is refused while recording. A candidate can use the on-screen **Play question / +1 minute** controls; *spoken commands* are **not** interpreted as control actions, and will not automatically replay or extend. The microphone still records the candidate's deliberate responses; a short muted segment may be present while the check-in plays. The text answer is editable and is sent to the model **only when Submit is clicked**.
+
+## Recording evidence and privacy
+
+`POST /api/acoustic-checkin` accepts only a current `question_id`, with the same local bearer/Origin safeguards as other endpoints. It stores at most one timestamp per question as `source=client_observed_approximate_low_microphone_activity` in `timing.turns[].acoustic_checkins`, never an amplitude trace, audio clip, inferred personality, or correctness assessment. It is not proof the user literally made no sound. The server clock is monotonic and owns candidate time; the browser does not submit timing scores or silence duration. The GitHub repository never receives this runtime ledger automatically.
+
+## Verification scope
+
+Runs: `python -m unittest discover -s tests -v`, `node tests/silence_monitor_test.cjs`, `node tests/studio_silence_ui_test.cjs` and the pre-existing Node suites. Tested with a fake Web Audio stream/MediaRecorder and fake HTTP model; MacBook Pro microphone, native VoiceStudio voices, background-tab throttling, browser autoplay, multi-hour continuity and real spoken control requests are **not** certified. Read `docs/verification/checkins-0.8-python.txt` and `docs/verification/checkins-0.8-ui.txt` for actual commands/results from this build.

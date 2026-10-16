@@ -1,8 +1,12 @@
-# AI Interview · 0.2.0
+# AI Interview · 0.2.1
 
 **维护原来的面试 Skill，并把本地麦克风转文本程序直接装进 Skill。**
 
-[主入口](skills/ai-interview/SKILL.md) · [Codex 调用说明](skills/ai-interview/references/local-voice.md) · [本次验证](docs/VOICE-VERIFICATION.md)
+[主入口](skills/ai-interview/SKILL.md) · [Codex 调用说明](skills/ai-interview/references/local-voice.md) · [最终检查](docs/FINAL-REVIEW.md)
+
+## 最终检查修复
+
+0.2.1 修复了录音异常后的残片转写、关闭页面后的延迟权限结果、旧提交重试覆盖修正答案，以及停止后的答案交付。新增回归测试，所有改动直接进入 main。更新时替换整个 Skill，不要只替换入口文件。真实麦克风、Whisper 识别和本地 Codex 仍需在你的电脑上联调；自动测试不代替这些验证。
 
 ## 怎么用
 

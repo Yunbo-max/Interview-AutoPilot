@@ -20,7 +20,7 @@ class FakeRecorder {
   stop(){this.state='inactive';} // Native onstop is asynchronous, deliberately not fired here.
 }
 const context = {
-  document:{getElementById:element}, location:{hash:'#token=fixture',pathname:'/'},
+  crypto:require('node:crypto').webcrypto, document:{getElementById:element}, location:{hash:'#token=fixture',pathname:'/'},
   history:{replaceState(){}}, URLSearchParams, MediaRecorder:FakeRecorder, Blob,
   navigator:{mediaDevices:{async getUserMedia(){microphoneOpens++;return {getTracks:()=>[track]};}},
     clipboard:{async writeText(){}}},

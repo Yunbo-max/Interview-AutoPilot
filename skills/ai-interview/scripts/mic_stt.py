@@ -25,7 +25,7 @@ from urllib.parse import parse_qs, urlsplit
 import uuid
 import webbrowser
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 ROOT = Path(__file__).resolve().parent
 MAX_AUDIO_BYTES = 20 * 1024 * 1024
 MAX_JSON_BYTES = 256 * 1024
@@ -147,7 +147,7 @@ class Handler(BaseHTTPRequestHandler):
             return False
         if api:
             token = self.headers.get('Authorization', '')
-            if not secrets.compare_digest(token, 'Bearer '+self.state.token):
+            if not token.isascii() or not secrets.compare_digest(token, 'Bearer '+self.state.token):
                 self.json(403, {'error':'访问令牌无效；请重新打开终端打印的完整链接。'})
                 return False
         return True

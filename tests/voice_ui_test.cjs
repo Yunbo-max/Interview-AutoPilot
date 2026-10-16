@@ -17,7 +17,7 @@ class Recorder {
   stop(){this.state='inactive';}
 }
 const context={
-  document:{getElementById:element},location:{hash:'#token=fixture',pathname:'/'},history:{replaceState(){}},URLSearchParams,Blob,
+  crypto:require('node:crypto').webcrypto, document:{getElementById:element},location:{hash:'#token=fixture',pathname:'/'},history:{replaceState(){}},URLSearchParams,Blob,
   MediaRecorder:Recorder,
   navigator:{mediaDevices:{async getUserMedia(){opens++;return {getTracks:()=>[{stop(){stops++;}}]};}},clipboard:{async writeText(){}}},
   window:{isSecureContext:true,MediaRecorder:Recorder,addEventListener(){},confirm(){return true;}},

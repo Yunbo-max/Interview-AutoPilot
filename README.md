@@ -6,6 +6,10 @@ An evidence-grounded, adversarial interview skill for agents. The interviewer fo
 
 [中文说明](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Local voice](skills/ai-interview/references/local-voice.md) · [Voice verification](docs/VOICE-VERIFICATION.md)
 
+## Current release: 0.2.1
+
+Final review fixed queued recording-error callbacks, final-chunk size cancellation, late microphone permissions, stale confirmation retries and stop-state answer delivery. [Final verification](docs/FINAL-REVIEW.md) separates executed regression checks from untested hardware/model behavior. Update the entire installed skill directory; the public branch remains `main`.
+
 ## 0.2.0: microphone input is inside the skill
 
 The package now includes Python scripts and a local recording page. Local Codex can start the page, display a question and receive your **confirmed** spoken answer through a shell tool result. You do not need to manually copy each answer into chat while Codex's tool loop is active.
@@ -62,6 +66,7 @@ python3 -m pip install -r requirements-dev.txt
 python3 -m unittest discover -s tests -v
 node tests/ui_state_test.cjs
 node tests/voice_ui_test.cjs
+node tests/voice_failure_ui_test.cjs
 ```
 
 The Python suite includes real loopback HTTP and CLI tests using a **fake decoder**, plus the original design checks. Simulated media tests do not verify a real microphone. The broader 32 behavior/runtime scenarios remain `not_run`; do not count authored examples as successful evaluations.

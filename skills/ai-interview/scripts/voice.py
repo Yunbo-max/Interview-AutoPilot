@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from collections import OrderedDict
 import importlib.util
+import hashlib
 import json
 import math
 import os
@@ -23,7 +24,7 @@ import webbrowser
 
 from mic_stt import AppState, Handler, ThreadingHTTPServer, atomic_write, now, MAX_TEXT, MAX_JSON_BYTES, MAX_AUDIO_BYTES, MAX_DRAFT_AGE
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 ROOT = Path(__file__).resolve().parent
 ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]{0,79}\Z')
 
@@ -67,6 +68,12 @@ class BridgeState(AppState):
         did, text = payload.get('draft_id'), payload.get('text')
         if not isinstance(did, str) or not isinstance(text, str):
             raise ValueError('Missing draft_id or confirmed text.')
+        submission_id = payload.get('submission_id')
+        if submission_id is not None and (not isinstance(submission_id, str) or not ID.fullmatch(submission_id)):
+            raise ValueError('Invalid submission_id.')
+        expected_revision = payload.get('expected_revision')
+        if expected_revision is not None and (type(expected_revision) is not int or expected_revision < 0):
+            raise ValueError('Invalid expected_revision.')
         text = text.strip()
         if not text or len(text) > MAX_TEXT or '\x00' in text:
             raise ValueError('Confirmed text is empty, too long or invalid.')
@@ -77,10 +84,20 @@ class BridgeState(AppState):
             qid = entry['result'].get('question_id')
             if self.stopped or not self.question or qid != self.question['question_id']:
                 raise KeyError('This draft belongs to an older question; it cannot answer the current one.')
+            # Cache receipts across revisions: a delayed retry must not undo a correction.
+            digest = hashlib.sha256(text.encode('utf-8')).hexdigest()
+            # New clients use an intent ID; legacy clients fall back to content deduplication.
+            key = 'id:'+submission_id if submission_id is not None else 'legacy:'+digest
+            cached = entry['saved'].get(key)
+            if cached:
+                if cached['text_digest'] != digest:
+                    raise ValueError('A submission_id cannot be reused for different text.')
+                return cached['receipt']
             previous = self.answers.get(qid)
-            if previous and previous['draft_id'] == did and previous['confirmed_text'] == text:
-                return previous['receipt']
-            revision = (previous['revision'] if previous else 0) + 1
+            current_revision = previous['revision'] if previous else 0
+            if expected_revision is not None and expected_revision != current_revision:
+                raise ValueError('Answer revision changed. Review the latest answer before confirming again.')
+            revision = current_revision + 1
             # Text files are created only following the candidate's Confirm action.
             self.output_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
             stem = f'{qid}-r{revision}-{uuid.uuid4().hex}'
@@ -97,12 +114,15 @@ class BridgeState(AppState):
             atomic_write(js, json.dumps(record, ensure_ascii=False, indent=2)+'\n')
             atomic_write(self.output_dir/'latest.txt', text+'\n')
             self.answers[qid] = record
+            entry['saved'][key] = {'text_digest':digest, 'receipt':receipt}
             return receipt
 
     def get_answer(self, qid, after):
         if not isinstance(qid, str) or not ID.fullmatch(qid) or after < 0:
             raise ValueError('Invalid question_id or revision.')
         with self.state_lock:
+            if self.stopped:
+                return {'status':'stopped', 'question_id':qid}
             if qid not in self.questions:
                 raise ValueError('Unknown question ID.')
             answer = self.answers.get(qid)
@@ -121,7 +141,8 @@ class BridgeHandler(Handler):
         try:
             if parsed.path == '/api/question':
                 with self.state.state_lock:
-                    self.json(200, {'question':self.state.question, 'stopped':self.state.stopped})
+                    self.json(200, {'question':self.state.question, 'stopped':self.state.stopped,
+                        'answer_revision':self.state.answers.get((self.state.question or {}).get('question_id'), {}).get('revision', 0)})
             elif parsed.path == '/api/health':
                 self.json(200, {'version':VERSION, 'mode':'local-only', 'agent_mode':True,
                     'session_id':self.state.session_id, 'model':self.state.model_name,
@@ -140,7 +161,8 @@ class BridgeHandler(Handler):
         if not self.authorized(True):
             return
         if parsed.path == '/api/shutdown':
-            self.state.stopped = True
+            with self.state.state_lock:
+                self.state.stopped = True
             self.json(200, {'status':'stopped', 'note':'Close the browser tab to release any active microphone immediately.'})
             threading.Thread(target=self.server.shutdown, daemon=True).start()
             return
@@ -156,7 +178,7 @@ class BridgeHandler(Handler):
             return
         qid = self.headers.get('X-Question-ID', '')
         with self.state.state_lock:
-            if not self.state.question or qid != self.state.question['question_id']:
+            if self.state.stopped or not self.state.question or qid != self.state.question['question_id']:
                 self.json(409, {'error':'Question changed or missing. Reload the current question before recording.'}); return
         if not self.headers.get('Content-Type','').lower().startswith(('audio/', 'video/webm', 'video/mp4', 'application/octet-stream')):
             self.json(415, {'error':'Expected recorded audio.'}); return
@@ -204,10 +226,12 @@ class NoRedirect(HTTPRedirectHandler):
 
 def read_connection(directory):
     data = json.loads((Path(directory)/'connection.json').read_text(encoding='utf-8'))
+    if not isinstance(data, dict) or not isinstance(data.get('origin'), str):
+        raise ValueError('Invalid local bridge metadata; expected an object with an origin.')
     url = urlsplit(data['origin'])
     if url.scheme != 'http' or url.hostname != '127.0.0.1' or not url.port or url.username or url.password or url.path or url.query or url.fragment:
         raise ValueError('Refusing a non-loopback or malformed bridge address.')
-    if not isinstance(data.get('token'),str) or not data['token']:
+    if not isinstance(data.get('token'),str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,256}', data['token']):
         raise ValueError('Missing local bridge token.')
     return data
 
@@ -350,7 +374,7 @@ def main(argv=None):
             end=time.monotonic()+args.timeout
             while True:
                 result=request(args.session_dir,'GET','/api/answer?'+query)
-                if result['status']=='ready' or time.monotonic()>=end: break
+                if result['status'] in ('ready','stopped') or time.monotonic()>=end: break
                 time.sleep(min(.25,max(0,end-time.monotonic())))
         print(json.dumps(result,ensure_ascii=False,allow_nan=False)); return 0
     except (OSError,RuntimeError,ValueError,KeyError,subprocess.SubprocessError) as e:

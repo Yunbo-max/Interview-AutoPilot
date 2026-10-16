@@ -1,0 +1,3 @@
+# Web/PDF interview studio. Install in a private virtual environment.
+# Local speech recognition is optional; install requirements-voice.txt separately.
+pypdf>=5,<7

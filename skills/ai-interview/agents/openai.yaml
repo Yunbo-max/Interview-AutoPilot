@@ -1,6 +1,6 @@
 interface:
   display_name: "AI Interview"
   short_description: "Adversarial mock interviews with evidence-based review"
-  default_prompt: "Use $ai-interview to run a challenging mock interview using my existing materials. Match my language, verify host capabilities, and ask one question at a time. For microphone answers, use the bundled local voice commands and wait for confirmed text."
+  default_prompt: "Use $ai-interview to run a challenging mock interview using my existing materials. Match my language, verify host capabilities, and ask one question at a time. For microphone answers, prefer the bundled voice-first studio with PDF resume upload, role selection and model consent; otherwise use the local voice commands and wait for confirmed text."
 policy:
   allow_implicit_invocation: false

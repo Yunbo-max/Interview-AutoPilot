@@ -1,80 +1,73 @@
-# AI Interview
+# AI Interview · Voice-first, evidence-first
 
-**Defend your reasoning. Not just your resume.**
+**Upload a PDF resume. Choose Quant, ML, AI Research or Agent Engineering. Defend your reasoning in a voice-led interview — coding in the editor.**
 
-An evidence-grounded, adversarial interview skill for agents. The interviewer follows your answer, challenges a justified weak point, accepts a successful rebuttal and separates testing from teaching.
+Version **0.3.0** brings a runnable local interview studio alongside the established portable Skill. The studio is local HTTP on `127.0.0.1`: browser SpeechSynthesis speaks all non-coding questions; browser microphone records only after user action, then a locally cached faster-whisper model transcribes speech; the candidate corrects text and explicitly submits. Coding questions use a text editor and never run untrusted code. **No raw audio/video is deliberately stored or submitted to model APIs.** The extracted CV and confirmed answers are transmitted to the selected model only after explicit consent; all interactions use a single named interviewer backend.
 
-[中文说明](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Local voice](skills/ai-interview/references/local-voice.md) · [Voice verification](docs/VOICE-VERIFICATION.md)
+[简体中文](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Studio guide](skills/ai-interview/references/voice-first-studio.md) · [Design](docs/superpowers/specs/2026-10-16-voice-first-multirole-interview.md)
 
-## Current release: 0.2.1
-
-Final review fixed queued recording-error callbacks, final-chunk size cancellation, late microphone permissions, stale confirmation retries and stop-state answer delivery. [Final verification](docs/FINAL-REVIEW.md) separates executed regression checks from untested hardware/model behavior. Update the entire installed skill directory; the public branch remains `main`.
-
-## 0.2.0: microphone input is inside the skill
-
-The package now includes Python scripts and a local recording page. Local Codex can start the page, display a question and receive your **confirmed** spoken answer through a shell tool result. You do not need to manually copy each answer into chat while Codex's tool loop is active.
-
-Flow: **Codex asks → browser records with your permission → local Whisper transcribes → you correct and confirm → Codex's `wait` returns text → Codex follows up.**
-
-This is turn-based microphone input, not a complete real-time voice product. No speech-style analyzer, spoken interviewer output, full-duplex interruption, safe coding sandbox, automatic one-hour clock or always-on Codex service is claimed. Local interface tests are not real microphone/model tests; see the verification report.
-
-## Install
-
-Install/copy the whole `skills/ai-interview` folder to `~/.agents/skills/ai-interview` (or a supported repository-local `.agents/skills/` directory). Back up an old copy outside skill discovery paths first; do not leave two same-named active skills. Restart Codex if needed. [Official skill documentation](https://developers.openai.com/codex/skills/).
-
-The skill can be copied without the repository and still contains its runtime scripts. Put real resumes and session data in a separate private workspace, not this public source repository.
-
-Example invocation:
-
-```text
-$ai-interview Start a challenging mock interview using my supplied resume.
-Use the bundled local microphone input and match my language.
-Check voice.py doctor first. Ask before downloading dependencies/model weights.
-Start the local page, display one question at a time, and use wait to read my
-confirmed answers. Keep reference answers until review. Do not upload recordings,
-transcripts or session files to GitHub. Target 60 minutes with an external timer.
-```
-
-## Voice commands Codex can call
-
-Resolve `SKILL_DIR` from the loaded skill; choose a new private `SESSION` directory.
+## Quick start
 
 ```bash
-python3 "$SKILL_DIR/scripts/voice.py" doctor
-# Only after download approval:
-python3 "$SKILL_DIR/scripts/voice.py" setup --allow-download --model base
-python3 "$SKILL_DIR/scripts/voice.py" start --session-dir "$SESSION"
-python3 "$SKILL_DIR/scripts/voice.py" ask --session-dir "$SESSION" --question-id q001 --text "Why this algorithm?"
-python3 "$SKILL_DIR/scripts/voice.py" wait --session-dir "$SESSION" --question-id q001 --after-revision 0 --timeout 20
-python3 "$SKILL_DIR/scripts/voice.py" stop --session-dir "$SESSION"
+git clone https://github.com/Yunbo-max/AI-Interview.git
+cd AI-Interview
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
+python skills/ai-interview/scripts/interview_studio.py doctor
+# Without a speech model, typed answers and spoken interviewer output remain available:
+python skills/ai-interview/scripts/interview_studio.py serve --without-stt
 ```
 
-Use `python` on Windows when appropriate. Python 3.10+ is required; speech dependencies must support your Python/platform. `setup` creates a separate virtual environment and downloads weights; `start` loads cached weights only. Browser permission remains required and recording starts only on a click. No speech API key is needed. CPU int8 is the default, with float32 fallback. Each clip is limited to three minutes.
-
-`wait` returns JSON: `waiting` means no confirmed answer; `ready.answer.confirmed_text` contains the confirmed answer. Question IDs and revisions prevent stale answers and duplicate grading. Only an active Codex process making tool calls will consume it. Saving a file cannot wake a stopped Codex conversation. Say "continue voice interview" if the host has stopped waiting.
-
-## Other interview content
-
-The concise entry loads fourteen references on demand: setup, clock contract, adversarial questioning, research/resume depth, coding, mathematics, multimodal input, speech-assessment boundaries, evaluation, recovery, security, tool contracts, host adapters and executable local voice. Structured fixtures include reference coding/math answers. Strict mode defers teaching; explicit answer requests mark an attempt assisted. Challenging style never licenses personal attacks or false objections.
-
-## Verification and privacy
-
-Run checks locally:
+To activate **local** Whisper recognition (explicit network downloads, no speech API key):
 
 ```bash
-python3 -m pip install -r requirements-dev.txt
-python3 -m unittest discover -s tests -v
+python -m pip install -r skills/ai-interview/scripts/requirements-voice.txt
+python skills/ai-interview/scripts/interview_studio.py download-model --allow-download --model base
+python skills/ai-interview/scripts/interview_studio.py serve --model base
+```
+
+Open the **complete private localhost link** printed in the terminal. PDF extract is previewed first; choose a role, interviewer engine and language; consent before clicking Begin. Use Record → Stop → Correct transcript → Submit, or type. Click Replay to repeat spoken questions. Coding appears as a text editor. Review is downloadable only on explicit click.
+
+## Six role curricula
+
+| Role | One-hour target phases |
+|---|---|
+| Quant Research | HR 15, Math/Probability 20, Python coding 15, Quant research 10 |
+| Quant Developer | HR 15, LeetCode 20, Systems 15, Quant fundamentals 10 |
+| ML Engineer | HR 15, Coding 15, ML 20, MLOps 10 |
+| AI Researcher | HR 15, Transformer 15, RL/generation 15, Research design 15 |
+| LLM/Agent Engineer | HR 15, Coding 15, Transformer 10, Agent harness/MCP 20 |
+| Generative AI Researcher | HR 15, Mathematical foundations 10, Diffusion/flow matching 25, Research 10 |
+
+All candidates begin with **HR and adversarial resume questioning**, not a generic keyword quiz. Research roles still need mathematics; Quant is not the only role with math.
+
+## Seven backend choices, two integration families
+
+**CLI hosts (installed and authenticated independently):** Codex CLI (`codex exec`), Claude Code (`claude -p`), and Gemini CLI (`gemini -p`). These are bounded headless inference calls from the local studio; the Skill also works when invoked in their native interactive environments. No extra Hermes agent. CLI versions/permissions and subscriptions vary.
+
+**API model providers (keys in your local environment):** Qwen / Alibaba (`DASHSCOPE_API_KEY`, Singapore endpoint), DeepSeek (`DEEPSEEK_API_KEY`), GLM / Z.ai (`ZAI_API_KEY`), Kimi / Moonshot (`MOONSHOT_API_KEY`). The server uses provider-allowlisted HTTPS endpoints, no arbitrary URL proxy. Configure the relevant key before starting the studio; different providers have different access, quotas and pricing. Default model IDs can be replaced with `AI_INTERVIEW_<PROVIDER>_MODEL` environment variables. Secrets never belong in the browser, a resume or git.
+
+See [multi-host guide](skills/ai-interview/references/voice-first-studio.md) for copy paths and details: Codex `~/.agents/skills/ai-interview`, Claude Code `~/.claude/skills/ai-interview`, Gemini CLI `~/.gemini/skills/ai-interview` or `.agents` alias. Always install the **whole** Skill folder, not just SKILL.md.
+
+## Scope and honest limitations
+
+- Browser TTS depends on installed voices and permitted audio playback; visible text/replay is fallback.
+- Local Whisper depends on separately installed dependencies and cached weights. No guarantee of realtime accuracy or device compatibility without live testing.
+- Code is *not* executed; mathematical claims/reference solutions and code feedback are model-generated, not proof certificates or sandbox-test results.
+- Server clock measures active time (excluding pauses and model waits) only while the in-memory service is alive. No durable post-crash continuity or certified 60-minute endurance.
+- The interface is not full-duplex; no autonomous interruption, intonation analysis, webcam or Hermes multi-agent runtime.
+- Provider adapters are tested with mocks but not validated on all seven live accounts.
+
+Automated tests (no GitHub Actions or workflow files):
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m unittest discover -s tests -v
 node tests/ui_state_test.cjs
 node tests/voice_ui_test.cjs
 node tests/voice_failure_ui_test.cjs
+node tests/studio_ui_test.cjs
 ```
 
-The Python suite includes real loopback HTTP and CLI tests using a **fake decoder**, plus the original design checks. Simulated media tests do not verify a real microphone. The broader 32 behavior/runtime scenarios remain `not_run`; do not count authored examples as successful evaluations.
-
-No GitHub Actions/workflows are used. The old automatic design-check workflow was removed; source changes and ordinary verification logs are the only GitHub artifacts for this change. Historical verification reports remain historical.
-
-Do not publish candidate resumes, recorded media, transcripts, scores, bearer tokens or credentials. `connection.json` and the private browser link contain a local access token. Audio is not deliberately saved by the app; raw/corrected **text** is saved only on confirmation. Online Codex may send that text to its model provider. A local speech recognizer does not make the whole interview offline.
-
-## License
-
-MIT. [LICENSE](LICENSE). Original sample questions and fictional dialogues are teaching fixtures, not employer questions or an external benchmark.
+Full detail: [acceptance criteria](docs/ACCEPTANCE.md), [legacy design](docs/DESIGN.md), [studio specification](docs/superpowers/specs/2026-10-16-voice-first-multirole-interview.md). No real CVs, audio, transcripts, model keys or user data are committed to the public repository. MIT license.

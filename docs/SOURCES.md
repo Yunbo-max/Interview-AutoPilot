@@ -22,3 +22,15 @@ No existing third-party interview skill was copied into this package. Cross-exam
 - [Codex skills](https://developers.openai.com/codex/skills/): script/resource packaging and local skill discovery.
 - [faster-whisper](https://github.com/SYSTRAN/faster-whisper): local CPU model invocation; runtime requirement remains pinned to 1.2.1.
 - [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia): browser permission and secure-context requirements.
+
+## Voice-first multi-role studio (2026-10-16)
+
+- [Codex CLI](https://developers.openai.com/codex/cli/) — headless Codex can be invoked locally with an existing signed-in CLI.
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/cli-usage) — `claude -p` and structured `--output-format json` are documented; version compatibility requires a live check.
+- [Gemini CLI](https://geminicli.com/docs/cli/headless/) — `gemini -p`, JSON mode, and stdin; users require an installed, authenticated CLI.
+- [Qwen Model Studio](https://help.aliyun.com/en/model-studio/base-url) — HTTPS OpenAI-compatible endpoint and regional API keys.
+- [DeepSeek API](https://api-docs.deepseek.com/zh-cn/) — current chat-completions API and model IDs.
+- [Z.ai](https://docs.z.ai/guides/capabilities/mcp-call) — GLM model APIs and separate key/availability.
+- [Moonshot AI](https://www.kimi.ai/help/kimi-api/api-overview) — model API and associated account access.
+- [MDN Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis) — browser-dependent question TTS, not guaranteed reliable audio output on every device.
+- [pypdf documentation](https://pypdf.readthedocs.io/) — extract text from searchable PDFs; encrypted or scanned inputs require separate handling.

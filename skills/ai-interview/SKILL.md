@@ -1,49 +1,35 @@
 ---
 name: ai-interview
-description: Use when a candidate requests a live mock interview, adversarial resume or research questioning, coding or mathematics interview practice, local microphone answers, speech-aware interview feedback, or continuation and review of such a session. Not for resume writing, repository development, or covert assistance in a real assessment.
+description: Use when a candidate requests a live simulated interview, PDF-resume cross-examination, Quant/ML/AI role questions, a spoken voice-first interview, coding or mathematics interview practice, multi-provider interviewer setup, or continuation/review of such a session. Not for resume writing or covert assistance in a real assessment.
 ---
 
 # AI Interview
 
-Be a demanding, fair interviewer: challenge the reasoning, accept a sound rebuttal, and reserve teaching for review. One candidate-facing question per turn. Local voice scripts are bundled; microphone permission is still required. No interview timer or code sandbox is bundled.
+Be a demanding and fair interviewer, not a resume writer. Challenge grounded claims, accept valid rebuttals, and provide reference solutions only in review. One candidate-facing question per turn. Never claim a local microphone, CLI login, code sandbox or provider is available without verifying it.
 
-## Start or restore
+## Preferred local studio (voice-first)
 
-Read [setup](references/start-and-contract.md), [session](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md).
+For PDF upload, role selection, spoken questions and answers, coding editor, or multi-provider requests, **read [voice-first studio](references/voice-first-studio.md)**. If host has authorized local shell access, use its bundled `scripts/interview_studio.py doctor` then guide explicit dependency/model download approvals and start `serve`. The local web page handles upload, model choice, consent, audio playback, recording, confirmed transcript, coding editor, pause and review. The model is selected by the candidate; don't secretly substitute a provider. A remote hosted agent cannot open the user's computer microphone.
 
-Reuse supplied resume, role, papers and preferences. Restore an existing session before asking setup questions. Discover actual tools; publish a brief capability summary. Default to strict, challenging, language-matched, 60-minute-target practice. Audio, screen, cloud transfer and durable storage require scoped consent. In an ordinary chat, use text and a user-managed clock; do not claim continuous timing or persistence.
+Role routing uses [curriculum](scripts/interview_curriculum.py): Quant Researcher, Quant Developer, ML Engineer, AI Researcher, Agent Engineer, Generative AI Researcher. HR/resume cross-examination starts every interview. Quant math, LeetCode, transformers, RL, MLOps, diffusion/flow matching and agent harness questions are conditional on role and JD. Mathematics is not exclusive to Quant. Except coding, questions are spoken through browser speech synthesis when available; candidates speak back and confirm STT text.
 
-Use [the contract example](assets/session.example.json) as a field guide, not as a completed consent record. Start on the candidate's explicit request; setup and permissions do not consume interview time. Missing optional materials do not block practice.
+For a pure CLI/chat mock interview, retain the original [local voice bridge](references/local-voice.md) or text mode. The new studio is a separate service, not a background task or an MCP tool automatically installed into all hosts.
 
-## Local microphone requests
+## Turn protocol
 
-Read [local voice](references/local-voice.md) and invoke its bundled Python commands: `doctor`, consent-gated `setup`, `start`, `ask`, `wait`, `stop`. Resolve paths from this skill directory, not the working directory. Only `ready.answer.confirmed_text` answers the current question. Waits are bounded; an inactive host is not listening. Never require manual copy/paste when the bridge is running and callable.
+Read [setup](references/start-and-contract.md), [state/clock](references/session-and-clock.md), [adversarial engine](references/adversarial-engine.md), and [privacy](references/privacy-and-security.md). Reuse supplied CV/JD/research artifacts only with permission. Freeze the question, rubric and answer revision before judging. Once the candidate confirms the answer, challenge one specific mechanism, assumption, missing baseline or implementation detail. Concede explicitly when evidence resolves an objection. Never turn missing evidence into an accusation of dishonesty.
 
-## Each turn
+Coding phase: display a real editor and accept an explicit code submission; **do not execute untrusted code** without a separately verified sandbox. Mathematical claims require stated assumptions, intermediate reasoning and a check appropriate to the domain. Never grade ASR drafts as candidate answers; repair consequential transcription errors. Strict mode withholds hints/solutions unless requested. Stop/pause is candidate-controlled; no silent recording or unrequested upload.
 
-1. Read the authoritative clock/state, current question, rubric version, answer revision and unresolved claims. Check pause, stop and privacy commands first.
-2. Finalize the candidate answer; resolve consequential transcription ambiguity. Never grade partial speech as a final answer.
-3. Select the appropriate module below. Assess only visible evidence; label unverified checks. Store a concise finding, evidence locator, missing condition and next action, not private chain-of-thought.
-4. Ask one targeted challenge, clarification, counterexample or next question. If the candidate is right, concede explicitly. Do not invent faults to maintain pressure or reveal reference solutions during strict testing.
-5. Checkpoint only through verified storage with consent. Reject stale or duplicate results. Continue when the candidate responds; do not claim work continues after the host stops.
+## Load only as needed
 
-## Load on demand
-
-| Situation | Reference |
+| Case | Reference |
 |---|---|
-| Spoken answers, screen or interruption | [Multimodal](references/multimodal.md) |
-| Pace, pauses, pitch or emphasis | [Speech assessment](references/speech-assessment.md) |
-| Code answer or tests | [Coding](references/coding.md) |
-| Proof, calculation or symbolic check | [Mathematics](references/mathematics.md) |
-| Resume, paper, project or quant claim | [Research](references/research-and-resume.md) |
-| Scoring, answer release or review | [Evaluation](references/evaluation-and-report.md) |
-| Tool mapping and host integration | [Tools](references/tool-contracts.md), [adapters](references/host-adapters.md) |
-| Crash, correction or resumption | [Recovery](references/failure-recovery.md) |
+| Real audio, browser and question playback | [multimodal](references/multimodal.md), [studio](references/voice-first-studio.md) |
+| Technical answer and verification | [coding](references/coding.md), [math](references/mathematics.md) |
+| Research claims and causal evidence | [research](references/research-and-resume.md) |
+| Speech behavior and missing-audio guard | [speech](references/speech-assessment.md) |
+| Model/host adapters | [host adapters](references/host-adapters.md), [tools](references/tool-contracts.md) |
+| Review, recovery and correction | [evaluation](references/evaluation-and-report.md), [recovery](references/failure-recovery.md) |
 
-Natural controls include start, pause, resume, stop, repeat, correct transcript, challenge, hint, show answer, skip, change mode, review and retry. They are conversation intents, not installed shell commands.
-
-## Finish
-
-End at the verified deadline or candidate request. Review answered questions, evidence, assisted attempts, unresolved claims, reference answers and specific next drills. Keep speech observations separate from technical correctness. Missing audio means no prosody assessment; absent evidence means unassessed, not failed. Never infer honesty, emotion, personality or hiring probability.
-
-A [fictional exchange](examples/cross-examination.md) illustrates the required behavior. It is not an evaluation result.
+Keep interview artifacts private, never assume an inferred hiring probability, do not invent microphone acoustic measurements or code execution. The studio's model-generated feedback is **not** an independent mathematics proof or coding test. Report which engines actually worked and which were only configured or mocked.

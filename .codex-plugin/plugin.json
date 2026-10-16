@@ -1,6 +1,6 @@
 {
   "name": "ai-interview",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Evidence-grounded mock interviews with bundled local microphone-to-text scripts for Codex. Text mode remains portable; voice requires local execution and browser consent.",
   "skills": "./skills/",
   "interface": {

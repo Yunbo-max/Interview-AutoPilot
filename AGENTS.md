@@ -1,6 +1,6 @@
 # Repository instructions
 
-This repository contains an interview skill, a local microphone/STT bridge, and a broader normative runtime design. It is not a complete one-hour/full-duplex interview application.
+This repository contains an interview skill, a local microphone/STT bridge, a six-role voice-first interview studio with multi-provider routing, and a broader normative runtime design. It is not a certified full-duplex or crash-resilient one-hour application.
 
 Do not start an interview when the user is authoring, reviewing, installing or debugging this repository. Activate `skills/ai-interview/SKILL.md` only for an explicit simulation, continuation or review request.
 

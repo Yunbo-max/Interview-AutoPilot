@@ -9,7 +9,7 @@
     <a href="README.zh-CN.md">简体中文</a>
   </p>
   <p>
-    <img alt="Version 0.6.0" src="https://img.shields.io/badge/version-0.6.0-234f3d?style=flat-square" />
+    <img alt="Version 0.7.0" src="https://img.shields.io/badge/version-0.7.0-234f3d?style=flat-square" />
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-234f3d?style=flat-square" />
     <img alt="Mac one-click setup" src="https://img.shields.io/badge/Mac-one--click_setup-a7d79f?style=flat-square" />
     <img alt="Local-first voice" src="https://img.shields.io/badge/voice-local--first-a7d79f?style=flat-square" />
@@ -60,6 +60,19 @@ VoiceStudio's packaged local backend requires an **Apple Silicon Mac with macOS 
 
 **Speaking is the default, not the only input.** VoiceStudio supports streaming transcript previews; **only the final transcript you confirm is sent to the chosen interviewer model.** This is currently *turn-based*, not full-duplex speech. Candidate code is **not executed** by the built-in editor.
 
+### Timekeeper Agent · sensible time pressure, not arbitrary penalties
+
+A **separate deterministic local Timekeeper** now records question-by-question active seconds while the interviewer focuses on technical follow-ups. It does **not** call another LLM, listen for acoustic silence, open the microphone, auto-skip a question, or judge correctness from time taken. The browser displays a per-question clock alongside the existing 60-minute session clock, and can speak a short reminder when you are **not** recording.
+
+| Question type | First reminder | Progress nudge | Offer to skip |
+| :--- | ---: | ---: | ---: |
+| **HR / resume** | **1 minute** | **2 minutes** | **5 minutes** |
+| Transformer / RL / Agent / ML / Systems / Quant | 1m 30s | 3 minutes | 5 minutes |
+| **Math / research / generative** | 2 minutes | 4 minutes | 6 minutes |
+| **Coding** | 5 minutes | 10 minutes | 15 minutes |
+
+You can explicitly **add one minute** (up to twice; suggested question pacing only), **skip without a negative assessment**, or **pause** the session. Local model inference and bound Whisper/VoiceStudio **transcription processing** are excluded from candidate active time. The total session still ends at 60 active minutes, with a warning at five and one minute remaining; the review includes a per-question timing ledger. **No submission is not the same as silence or a wrong answer.** A closed tab cannot receive an audible reminder—pause before leaving. [Timing contract and known limits](skills/ai-interview/references/timekeeper-agent.md).
+
 ### Choose your track
 
 | Quant & engineering | AI & research |
@@ -92,7 +105,7 @@ Voice interviews **already exist** in open source. Our focus is the combination 
 | | **AI-Interview (this project)** | [ai-job-search](https://github.com/MadsLorentzen/ai-job-search) | [DeepInterview](https://github.com/ngoanpv/DeepInterview) | [VoiceStudio](https://github.com/debpalash/VoiceStudio) |
 | :--- | :--- | :--- | :--- | :--- |
 | **Primary purpose** | Technical/research interview practice | Job discovery, applications and interview preparation | Real-time spoken mock interviews and coaching | Audio generation, transcription and voice workflows |
-| **Interview conversation** | **Turn-based voice**, critical follow-ups and resume defense | Stage/JD-specific prep; optional chat roleplay | **Real-time voice** with barge-in in its live-provider path | Speech APIs, **not** an interviewing agent |
+| **Interview conversation** | **Turn-based voice**, critical follow-ups, timed reminders and resume defense | Stage/JD-specific prep; optional chat roleplay | **Real-time voice** with barge-in in its live-provider path | Speech APIs, **not** an interviewing agent |
 | **Technical angle** | **Quant, ML, Transformers, RL, Agents, Diffusion** | Tailored to job applications | Adaptive CV/JD-based interviews and question packs | ASR/TTS engines and voice profiles |
 | **Research freshness** | Optional **dated arXiv/HF abstracts** for technical challenges | Company and role research | Company research and study coaching | Not an interview-research product |
 | **After the session** | Opt-in topic evidence/coverage; reassess without assuming forgetting | Application tracker, feedback and outcomes | Scored report and study coach | Voice/audio project history |
@@ -115,7 +128,7 @@ AI-Interview separates **the interviewer** (reasoning) from **the voice** (speec
 - **Your resume, raw recording and unsubmitted text are not committed to GitHub.** PDF parsing is local; the interview page does not intentionally persist raw recordings. Persistent candidate workspace defaults to `~/.local/share/ai-interview/`.
 - **LLM calls are not automatically offline.** After explicit consent, the selected model provider receives confirmed answers and the chosen CV/JD/context. VoiceStudio can also be configured with optional remote engines; check its settings.
 - **No auto-applications or hidden interview assistance.** The app does not log in to LinkedIn, control a mouse, execute arbitrary candidate code, infer personality from speech or promise interruption-quality full duplex.
-- **Verification is scoped.** v0.6.0 recorded 157 passing Python tests and five simulated UI suites. Mac installation, actual microphones, voice-model quality, all provider accounts and continuous one-hour sessions have **not** been certified on real devices.
+- **Verification is scoped.** v0.7.0 passed 177 Python tests and six Node UI simulation suites; see the [Timekeeper verification](docs/TIMEKEEPER-VERIFICATION.md) for exact results. Mac installation, actual microphones, voice-model quality, all provider accounts and continuous one-hour sessions have **not** been certified on real devices.
 
 [Installer verification](docs/ONE-CLICK-MAC-VERIFICATION.md) · [Voice bridge verification](docs/VOICESTUDIO-VERIFICATION.md) · [Career workflow verification](docs/CAREER-VERIFICATION.md) · [Source and research rules](docs/SOURCES.md)
 

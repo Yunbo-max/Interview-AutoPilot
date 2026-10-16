@@ -12,3 +12,16 @@
 
 .speech-settings .voice-optin{display:flex;align-items:center;gap:6px;flex-basis:100%;font:11px/1.3 ui-sans-serif,sans-serif;color:var(--ash);letter-spacing:0}
 .speech-settings .voice-optin input{accent-color:var(--green)}
+
+/* Independent timekeeper: displays active answer time without claiming acoustic silence. */
+.timekeeper-panel{margin-top:22px;border-top:1px solid var(--line);padding-top:17px;display:grid;gap:10px}
+.timekeeper-header{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#question-elapsed{font:600 12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--moss)}
+.timekeeper-track{height:5px;background:#e9eeea;border-radius:99px;overflow:hidden}
+#question-progress{background:var(--green);height:100%;width:0;transition:width .3s ease;border-radius:99px}
+.timekeeper-footer{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#timekeeper-note{margin:0;flex:1;min-width:205px;font-size:12px;color:var(--ash)}
+.timekeeper-actions{display:flex;gap:8px;flex-wrap:wrap}
+.timekeeper-actions button{font-size:12px;padding:7px 10px}
+.timekeeper-actions button:disabled{opacity:.45;cursor:not-allowed}
+#timing-summary{background:#f0f6f1;padding:12px 14px;border-radius:8px;color:var(--moss)}

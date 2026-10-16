@@ -29,7 +29,7 @@ installs model-provider credentials or suppresses macOS Gatekeeper.
 
 ## Voice-first interview — preferred mode
 
-For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). Local shells may run `doctor` then consented `serve`; remote agents cannot access a microphone.
+For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [Timekeeper Agent](references/timekeeper-agent.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). Local shells may run `doctor` then consented `serve`; remote agents cannot access a microphone.
 
 Candidates choose role, PDF, JD and model; uploading to model and paper refresh require consent. Browser TTS and clicked microphone enable voice turns; **only confirmed text** is submitted. Coding uses an editor; never execute untrusted code. All roles begin with HR/resume questioning.
 
@@ -38,6 +38,8 @@ Candidates choose role, PDF, JD and model; uploading to model and paper refresh 
 For a candidate who explicitly wants **VoiceStudio**, first read [VoiceStudio backend — install & use](references/voicestudio-backend.md). This AGPL-3.0 app is **separately installed**, not bundled. `scripts/career.py interview --doctor --voicestudio` checks its fixed loopback protocol; `scripts/career.py interview --voicestudio --without-stt` can use its TTS, real-time streaming partial subtitles (with optional `websockets` relay), and batch STT when available. VoiceStudio requires separate consent and a microphone click. Only summary finals become **editable drafts**. Retain browser/Whisper fallbacks; never expose tokens or automatically install VoiceStudio.
 
 ## Interview turn policy
+
+Use the local Timekeeper to track each question, gently remind at role-appropriate milestones, record explicit skips and avoid grading unsubmitted answers. It is a deterministic supervisor, **not** another LLM or speech-silence detector; do not invent elapsed times in chat-only mode.
 
 Challenge the candidate's **specific preceding claim**; request an assumption, alternative, causal control, test or counterexample. Concede a supported rebuttal; never manufacture a fault to maintain pressure. One question per turn. Keep teaching/reference solutions for review in strict mode. Label unverified code and mathematical claims honestly. Distinguish role fundamentals from sourced current developments; do not treat a stale evidence timestamp as failure. An individual news/paper abstract does not certify the full experiment.
 

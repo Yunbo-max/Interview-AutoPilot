@@ -65,6 +65,80 @@ class HttpTests(unittest.TestCase):
         status,_=self.req('POST','/api/answer',json.dumps({'question_id':data['id'],'text':'other','kind':'voice','submission_id':'twice'}).encode(),{'Content-Type':'application/json'})
         self.assertEqual(status,409)
 
+    def test_timekeeper_watchdog_and_explicit_skip(self):
+        from unittest.mock import patch
+        now=[0.0]
+        self.state.interview._clock.source=lambda:now[0]
+        with patch('interview_studio.read_resume_pdf',return_value='Evidence about my project and baselines.'):
+            status,_=self.req('POST','/api/resume',self.pdf,{'Content-Type':'application/pdf'})
+        self.assertEqual(status,200)
+        status,q=self.req('POST','/api/start',json.dumps({'role':'ai_researcher','provider':'codex','consent':True}).encode(),{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        now[0]=60
+        self.server.service_actions()  # watchdog independent of /api/state calls
+        state=self.req('GET','/api/state')[1]
+        self.assertEqual(state['timekeeper']['question_id'],q['id'])
+        self.assertEqual(state['timekeeper']['elapsed_seconds'],60)
+        self.assertEqual(state['timekeeper']['reminders'][0]['at_seconds'],60)
+        req={'question_id':q['id']}
+        status,response=self.req('POST','/api/extend-question',json.dumps(req).encode(),{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertEqual(response['timekeeper']['recommended_seconds'],360)
+        self.assertEqual(self.req('POST','/api/extend-question',json.dumps({'question_id':'stale'}).encode(),{'Content-Type':'application/json'})[0],409)
+        skip=json.dumps({'question_id':q['id'],'submission_id':'skip-one'}).encode()
+        status,nextq=self.req('POST','/api/skip',skip,{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertNotEqual(nextq['id'],q['id'])
+        self.assertEqual(self.req('POST','/api/skip',skip,{'Content-Type':'application/json'})[1],nextq)
+        self.assertEqual(self.req('POST','/api/skip',json.dumps({'question_id':q['id'],'submission_id':'new-key'}).encode(),{'Content-Type':'application/json'})[0],409)
+        state=self.req('GET','/api/state')[1]
+        self.assertEqual(state['history'][-1]['response_status'],'skipped')
+        self.assertEqual(state['history'][-1]['answer_elapsed_seconds'],60)
+        self.assertEqual(state['timekeeper']['question_id'],nextq['id'])
+
+    def test_local_speech_decoding_wait_does_not_consume_candidate_time(self):
+        now=[0.0]
+        self.state.interview._clock.source=lambda:now[0]
+        with patch('interview_studio.read_resume_pdf',return_value='I built a valid research project'):
+            self.req('POST','/api/resume',self.pdf,{'Content-Type':'application/pdf'})
+        status,q=self.req('POST','/api/start',json.dumps({'role':'ai_researcher','provider':'codex','consent':True}).encode(),{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        now[0]=85
+        class SlowSpeech:
+            def transcribe(self,raw,lang):
+                now[0]+=200  # fake expensive local Whisper decode
+                return {'raw_text':'my actual answer','duration_seconds':3}
+        self.state.speech=SlowSpeech()
+        status,data=self.req('POST','/api/transcribe?backend=builtin&question_id='+q['id'],b'audio bytes',{'Content-Type':'audio/webm'})
+        self.assertEqual(status,200)
+        self.assertEqual(data['raw_text'],'my actual answer')
+        state=self.req('GET','/api/state')[1]
+        self.assertEqual(state['timekeeper']['elapsed_seconds'],85,'ASR processing time must be excluded')
+        self.assertFalse(state['timekeeper']['machine_waiting'])
+        status,_=self.req('POST','/api/transcribe?backend=builtin&question_id=stale',b'audio bytes',{'Content-Type':'audio/webm'})
+        self.assertEqual(status,409)
+
+    def test_total_deadline_auto_expires_without_browser_poll_or_model_call(self):
+        now=[0.0]
+        self.state.interview._clock.source=lambda:now[0]
+        with patch('interview_studio.read_resume_pdf',return_value='My resume has evidence.'):
+            self.req('POST','/api/resume',self.pdf,{'Content-Type':'application/pdf'})
+        status,q=self.req('POST','/api/start',json.dumps({'role':'agent_engineer','provider':'codex','consent':True}).encode(),{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        now[0]=3601
+        self.server.service_actions()
+        self.assertEqual(self.state.interview.status,'completed','background server pulse must expire without GET')
+        state=self.req('GET','/api/state')[1]
+        self.assertEqual(state['status'],'completed')
+        self.assertEqual(len(state['timekeeper']['session_reminders']),3)
+        self.assertIsNone(state['question'])
+        self.assertEqual(self.req('POST','/api/answer',json.dumps({'question_id':q['id'],'text':'late','kind':'voice','submission_id':'late'}).encode(),{'Content-Type':'application/json'})[0],409)
+        status,review=self.req('POST','/api/finish',b'{}',{'Content-Type':'application/json'})
+        self.assertEqual(status,200)
+        self.assertEqual(review['timing']['turns'][0]['outcome'],'time_limit')
+        self.assertEqual(review['timing']['unanswered_count'],1)
+        self.assertNotIn('My resume',str(review['timing']))
+
     def test_upload_rejects_other_content(self):
         self.assertEqual(self.req('POST','/api/resume',b'hello',{'Content-Type':'application/pdf'})[0],400)
         self.assertEqual(self.req('POST','/api/resume',b'hello',{'Content-Type':'text/plain'})[0],415)

@@ -24,7 +24,7 @@ class ReadmePresentationTests(unittest.TestCase):
                 self.assertIn('ai-job-search', source)
                 self.assertIn('VoiceStudio', source)
                 self.assertIn('arXiv', source)
-                self.assertIn('0.6.0', source)
+                self.assertIn((ROOT / 'VERSION').read_text(encoding='utf-8').strip(), source)
                 self.assertIn('MIT', source)
 
     def test_svg_images_are_portable_and_have_no_executable_content(self):

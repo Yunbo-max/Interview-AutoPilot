@@ -23,7 +23,7 @@ from career import (CareerWorkspace, briefing_for_role, memory_brief, topic_revi
     get_public_bytes, arxiv_search_url, parse_arxiv_feed, parse_hf_daily, HF_BASE, utcnow)
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '0.6.0'
+VERSION = '0.7.0'
 
 
 class StudioState(AppState):
@@ -175,10 +175,18 @@ class StudioHandler(LocalHandler):
                 self.json(415,{'error':'Audio content required'});return
             if not self.state.transcription_lock.acquire(blocking=False):
                 self.json(409,{'error':'Another audio clip is being transcribed'});return
+            hold_token=None
             try:
                 body=self.read_body(MAX_AUDIO_BYTES)
                 if body is None:return
                 if not body: self.json(400,{'error':'Empty recording'});return
+                # Modern clients bind ASR to the active question. Untrusted old/stale
+                # audio cannot freeze the clock or overwrite another turn's draft.
+                question_id=parse_qs(urlsplit(self.path).query).get('question_id',[None])[0]
+                if question_id is not None:
+                    hold_token=self.state.interview.begin_host_wait(question_id,'stt')
+                    if hold_token is None:
+                        self.json(409,{'error':'Speech request is not for the active question'});return
                 if selected=='voicestudio':
                     text=self.state.voicestudio.transcribe(body,mime)
                     result={'raw_text':text, 'backend':'voicestudio', 'final':True}
@@ -189,9 +197,11 @@ class StudioHandler(LocalHandler):
                 self.json(200,result)
             except Exception as exc:
                 self.json(422,{'error':f'Speech recognition failed ({type(exc).__name__}); you may type your answer'})
-            finally:self.state.transcription_lock.release()
+            finally:
+                self.state.interview.end_host_wait(hold_token)
+                self.state.transcription_lock.release()
             return
-        if path not in ('/api/start','/api/answer','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory'):
+        if path not in ('/api/start','/api/answer','/api/skip','/api/extend-question','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory'):
             self.json(404,{'error':'Not found'});return
         if self.headers.get('Content-Type','').split(';')[0].strip().lower()!='application/json':
             self.json(415,{'error':'JSON content required'});return
@@ -248,6 +258,12 @@ class StudioHandler(LocalHandler):
                       data.get('focus',''),data.get('language','zh'),trend_brief=trend,memory_brief=history,job_brief=chosen_job)
             elif path=='/api/answer':
                 result=interview.submit(data.get('question_id'),data.get('text'),data.get('kind'),data.get('submission_id'))
+            elif path=='/api/skip':
+                result=interview.skip(data.get('question_id'),data.get('submission_id'))
+            elif path=='/api/extend-question':
+                seconds=interview.extend_question(data.get('question_id'))
+                result={'status':'extended','additional_seconds':seconds,
+                        'timekeeper':interview.public_state()['timekeeper']}
             elif path=='/api/pause':interview.pause();result=interview.public_state()
             elif path=='/api/resume-session':interview.resume();result=interview.public_state()
             else:result=interview.finish()
@@ -258,8 +274,17 @@ class StudioHandler(LocalHandler):
             self.json(502,{'error':str(exc)})
 
 
+class InterviewServer(ThreadingHTTPServer):
+    """Run the deterministic timekeeper on the local server's service loop.
+
+    It never calls a model; pulse is nonblocking when a turn is in flight.
+    """
+    def service_actions(self):
+        self.state.interview.pulse()
+
+
 def make_server(state:StudioState,port=0):
-    server=ThreadingHTTPServer(('127.0.0.1',port),StudioHandler)
+    server=InterviewServer(('127.0.0.1',port),StudioHandler)
     server.daemon_threads=True
     server.state=state
     state.host=f'127.0.0.1:{server.server_address[1]}'

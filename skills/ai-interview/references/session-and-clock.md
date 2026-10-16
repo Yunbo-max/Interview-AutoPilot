@@ -29,3 +29,19 @@ Use one writer per session. Every operation carries session ID, turn ID, input r
 One candidate-facing interviewer at a time even when specialist tools run concurrently. Review work may run concurrently only within a live capable runtime, with bounded timeouts and no overlapping speech. Do not claim independent multi-agent validation when only one agent performed the checks.
 
 A checkpoint saves continuity, not proof that an answer is true. Local hashes can detect accidental changes but cannot prove experiments were genuine. Resume the current question rather than restarting an hour or repeating resolved challenges.
+
+## Implemented local Timekeeper (v0.7)
+
+The voice studio runs a [deterministic Timekeeper Agent](timekeeper-agent.md)
+inside its own local server loop. It monitors time since the active question
+was issued, with different *advisory* reminders for HR, math/research and
+coding. This is not a second LLM, a speech/silence classifier or an automatic
+negative evaluation. Candidates can request up to two extra advisory minutes
+or explicitly skip without correctness grading. Session duration remains 3600
+active seconds; the server reaches the deadline without calling a model.
+
+The review exports actual per-question active seconds and explicit skips. The
+clock excludes bound STT machine processing, manual pauses and interviewer
+model execution; no code or voice analyzer judges response speed. A background
+service loop can log a reminder while the browser is closed but cannot speak
+or notify a closed browser. Closing a tab does not implicitly pause the session.

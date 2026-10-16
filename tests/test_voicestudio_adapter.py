@@ -184,6 +184,50 @@ class SpeechRelayTests(unittest.TestCase):
         try:asyncio.run(probe())
         finally:relay.stop();server.server_close()
 
+    def test_stream_finalization_excludes_machine_wait_from_question_clock(self):
+        import asyncio
+        from websockets.asyncio.server import serve
+        from websockets.asyncio.client import connect
+        from voicestudio_relay import VoiceStudioRelay
+        from interview_studio import StudioState, make_server
+        class Router:
+            def availability(self):return []
+            def generate(self,prompt,provider):return {'question':'Q','assessment':''}
+        now=[0.0]
+        state=StudioState(Router(),token='time-relay')
+        state.interview._clock.source=lambda:now[0]
+        state.interview.status='active'
+        state.interview.current_question={'id':'time-q','kind':'voice','phase':'hr','question':'Explain your hypothesis.'}
+        state.interview._clock.start()
+        state.interview.timekeeper.begin(state.interview.current_question,0)
+        server=make_server(state,0)
+        async def scenario():
+            async def fake_voice_backend(ws):
+                async for msg in ws:
+                    if not isinstance(msg,str):continue
+                    if json.loads(msg).get('type')=='input_audio.end':
+                        now[0]+=200 # model inference after the candidate finished speaking
+                        await ws.send(json.dumps({'type':'final','final_kind':'summary','text':'Answer'}))
+                        return
+            async with serve(fake_voice_backend,'127.0.0.1',0) as upstream:
+                class Backend: websocket_upstream=f'ws://127.0.0.1:{upstream.sockets[0].getsockname()[1]}/v1/audio/transcriptions/stream'
+                relay=VoiceStudioRelay(state,Backend());relay.start()
+                try:
+                    async with connect(relay.url,origin=state.origin,proxy=None) as ws:
+                        await ws.send(json.dumps({'type':'start','token':'time-relay','question_id':'time-q'}))
+                        self.assertEqual(json.loads(await asyncio.wait_for(ws.recv(),3))['type'],'ready')
+                        now[0]=30
+                        await ws.send(b'WEBM')
+                        await ws.send(json.dumps({'type':'input_audio.end'}))
+                        result=json.loads(await asyncio.wait_for(ws.recv(),3))
+                        self.assertEqual(result['text'],'Answer')
+                    self.assertEqual(state.interview.public_state()['timekeeper']['elapsed_seconds'],30)
+                    now[0]=240
+                    self.assertEqual(state.interview.public_state()['timekeeper']['elapsed_seconds'],40)
+                finally:relay.stop()
+        try:asyncio.run(scenario())
+        finally:server.server_close()
+
     def test_stream_proxy_reports_partials_only_final_summary(self):
         import asyncio
         from websockets.asyncio.server import serve

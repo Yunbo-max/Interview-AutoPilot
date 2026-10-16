@@ -7,7 +7,8 @@ const context = {question:null, role:null, provider:null, muted:false, busy:fals
   pendingId:null, pendingText:null, session:null, lastSpoken:null,
   builtinReady:false, voiceStudio:{available:false,streaming:false,voices:[],relay_url:null},
   speechChoice:'builtin', playback:null, playbackUrl:null, playFetch:null, speechEpoch:0,
-  live:null, recordingBytes:0, finishingRecording:false, openingRecording:false, departed:false};
+  live:null, recordingBytes:0, finishingRecording:false, openingRecording:false, departed:false,
+  paused:false, timekeeperSeen:new Set(), sessionWarningsSeen:new Set(), autoReviewPending:false, pendingSkipId:null};
 const MAX_CLIP_MS = 178000, MAX_AUDIO_BYTES = 20*1024*1024;
 
 function notice(message) { el('notice').textContent = message || ''; }
@@ -28,6 +29,8 @@ function setBusy(v){context.busy=v;
   el('submit').disabled=v;
   el('record').disabled=v||context.openingRecording||context.finishingRecording||!canRecord()||!context.question||context.question.kind==='code';
   el('pause').disabled=v;el('finish').disabled=v;
+  el('more-time').disabled=v||context.paused||!context.question;
+  el('skip-question').disabled=v||context.paused||!context.question;
 }
 function canRecord(){
   return el('speech-engine').value==='voicestudio' ? !!context.voiceStudio.available : !!context.builtinReady;
@@ -129,8 +132,12 @@ async function init(){
     if(!context.builtinReady && !context.voiceStudio.available){el('voice-info').textContent='No local STT is available. Type your response below, or install Whisper / start VoiceStudio.';notice('Local speech recognition not loaded. Text mode remains available.');}
     if(state.status!=='setup'){
       context.session=state;context.role=state.role;context.provider=state.provider;
-      if(state.status==='completed')renderReview(state.review || state);
-      else {show('session'); if(state.question)renderQuestion(state.question);updateClock(state);}
+      if(state.status==='completed')renderReview(state.review || await jsonPost('/api/finish',{}));
+      else {show('session');if(state.question){renderQuestion(state.question);
+        // Do not replay old reminders aloud after a tab reload.
+        for(const event of state.timekeeper?.reminders||[])context.timekeeperSeen.add(event.id);
+        for(const event of state.timekeeper?.session_reminders||[])context.sessionWarningsSeen.add(event.id);}
+        updateClock(state);}
     }
   }catch(e){notice('Unable to reach local interview service: '+e.message);}
 }
@@ -217,7 +224,9 @@ function renderQuestion(q){
   stopPlayback();
   if(context.recorder&&context.recorder.state!=='inactive')stopRecording(true);
   context.question=q;
-  context.pendingId=null;context.pendingText=null;
+  context.pendingId=null;context.pendingText=null;context.pendingSkipId=null;context.timekeeperSeen=new Set();
+  el('question-elapsed').textContent='00:00 / TIME GUIDE';el('question-progress').style.width='0%';
+  el('timekeeper-note').textContent='The timer tracks an unsubmitted answer, not microphone silence. It never grades thinking time.';
   el('role-label').textContent=context.roles?.find(r=>r.id===context.role)?.label?.toUpperCase()||context.role;
   el('phase-label').textContent=q.phase_label?.toUpperCase()||q.phase?.toUpperCase();
   el('question-id').textContent=q.id;
@@ -343,7 +352,7 @@ async function recordPressed(){
         }
         if(finalText===null){
           const backend=el('speech-engine').value==='voicestudio'?'voicestudio':'builtin';
-          const result=await api('/api/transcribe?backend='+backend,'POST',audio,audio.type);
+          const result=await api('/api/transcribe?backend='+backend+'&question_id='+encodeURIComponent(id),'POST',audio,audio.type);
           finalText=result.raw_text||'';
         }
         if(context.question?.id===id && !context.departed){
@@ -387,17 +396,92 @@ el('submit').addEventListener('click',async()=>{
   }catch(e){notice(e.message+' Your text remains available to retry.');}
   finally{setBusy(false);}
 });
+function clockLabel(seconds){
+  const s=Math.max(0,Math.floor(Number(seconds)||0));
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+function remindAloud(message,questionKind){
+  if(context.muted || context.busy || context.departed || context.paused ||
+     questionKind==='code' || context.openingRecording || context.finishingRecording ||
+     (context.recorder && context.recorder.state==='recording') ||
+     context.playback || !!el('transcript').value.trim() ||
+     !('speechSynthesis' in window) || window.speechSynthesis.speaking)return;
+  // Local, short alert; do not call another model or VoiceStudio just to tell time.
+  const u=new SpeechSynthesisUtterance(message);
+  u.lang=/[\u3400-\u9fff]/.test(message)?'zh-CN':'en-GB';u.rate=.96;
+  window.speechSynthesis.speak(u);
+}
+function updateQuestionTimer(timing,status){
+  if(!timing || timing.question_id!==context.question?.id)return;
+  const elapsed=timing.elapsed_seconds||0;
+  const budget=Math.max(1,timing.recommended_seconds||300);
+  el('question-elapsed').textContent=`${clockLabel(elapsed)} / ${clockLabel(budget)} GUIDE`;
+  el('question-progress').style.width=Math.min(100,100*elapsed/budget)+'%';
+  const reminders=timing.reminders||[];
+  const newest=reminders[reminders.length-1];
+  if(newest)el('timekeeper-note').textContent=newest.message;
+  const unread=reminders.filter(e=>!context.timekeeperSeen.has(e.id));
+  for(const reminder of unread)context.timekeeperSeen.add(reminder.id);
+  if(unread.length && status==='active' && context.question?.kind==='voice')
+    remindAloud(unread[unread.length-1].message,context.question.kind);
+  const remainingEvents=(timing.session_reminders||[]).filter(e=>!context.sessionWarningsSeen.has(e.id));
+  for(const event of remainingEvents)context.sessionWarningsSeen.add(event.id);
+  if(remainingEvents.length){
+    const latest=remainingEvents[remainingEvents.length-1];
+    el('timekeeper-note').textContent=latest.message;
+    if(status==='active')remindAloud(latest.message,context.question?.kind);
+  }
+}
 function updateClock(data){
-  const remaining=Math.max(0,(data.target_seconds||3600)-data.elapsed_seconds);
+  const remaining=Math.max(0,(data.target_seconds||3600)-(data.elapsed_seconds||0));
   el('clock').textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')} REMAINING`;
   el('progress-fill').style.width=Math.min(100,(data.elapsed_seconds/3600)*100)+'%';
   el('pause').textContent=data.status==='paused'?'Resume':'Pause';
+  context.paused=data.status==='paused';
+  updateQuestionTimer(data.timekeeper,data.status);
+  setBusy(context.busy);
 }
 setInterval(async()=>{
   if(el('session').hidden || context.busy)return;
-  try{const data=await api('/api/state');updateClock(data);}
+  try{const data=await api('/api/state');updateClock(data);
+    if(data.status==='completed' && !context.autoReviewPending){
+      context.autoReviewPending=true;stopPlayback();
+      if(context.recorder?.state==='recording')stopRecording(true);
+      setBusy(true);
+      try{renderReview(data.review||await jsonPost('/api/finish',{}));}
+      catch(e){context.autoReviewPending=false;notice('Interview clock finished; review could not load: '+e.message);}
+      finally{setBusy(false);}
+    }
+  }
   catch{notice('Connection to the local interview service is unavailable; no answer will be submitted until restored.');}
 },3000);
+el('more-time').addEventListener('click',async()=>{
+  const q=context.question;
+  if(!q||context.busy||context.paused)return;
+  setBusy(true);
+  try{
+    const result=await jsonPost('/api/extend-question',{question_id:q.id});
+    if(context.question?.id!==q.id)return;
+    updateQuestionTimer(result.timekeeper,'active');
+    notice("One minute added to this question's suggested budget. The 60-minute session limit is unchanged.");
+  }catch(e){notice('Cannot extend this question: '+e.message);}
+  finally{setBusy(false);}
+});
+el('skip-question').addEventListener('click',async()=>{
+  const q=context.question;
+  if(!q||context.busy||context.paused||context.openingRecording||context.finishingRecording||context.recorder?.state==='recording')return;
+  if(!confirm('Skip this question without grading it? Any unsubmitted draft will be discarded.'))return;
+  if(!context.pendingSkipId)context.pendingSkipId=newSubmissionId();
+  setBusy(true);stopPlayback();
+  try{
+    const response=await jsonPost('/api/skip',{question_id:q.id,submission_id:context.pendingSkipId});
+    if(response.status==='completed'){
+      renderReview(await jsonPost('/api/finish',{}));return;
+    }
+    renderQuestion(response);notice('Question explicitly skipped without a correctness rating.');
+  }catch(e){notice('Could not skip the question: '+e.message+'; try again.');}
+  finally{setBusy(false);}
+});
 el('pause').onclick=async()=>{
   if(context.busy)return;
   if(context.recorder?.state==='recording')stopRecording(true);
@@ -414,12 +498,15 @@ el('finish').onclick=async()=>{
   try{renderReview(await jsonPost('/api/finish',{}));}catch(e){notice(e.message);}finally{setBusy(false);}
 };
 function renderReview(data){
-  show('review');context.session=data;
+  show('review');context.session=data;context.question=null;
+  const stats=data.timing||{};
+  el('timing-summary').textContent=`Timekeeper: ${stats.answered_count||0} answered, ${stats.skipped_count||0} skipped, ${stats.unanswered_count||0} unfinished; ${stats.turns?.length||0} questions timed. Time taken is never treated as a competence score.`;
   const body=el('review-body');body.replaceChildren();
   for(const entry of data.history||[]){
     const box=document.createElement('section');box.className='review-entry';
     const title=document.createElement('strong');title.textContent=`${entry.phase?.toUpperCase()} — ${entry.question}`;box.appendChild(title);
-    const answer=document.createElement('pre');answer.textContent=entry.answer;box.appendChild(answer);
+    const answer=document.createElement('pre');answer.textContent=entry.response_status==='skipped'?'[Skipped explicitly · not assessed]':entry.answer;box.appendChild(answer);
+    const timing=document.createElement('p');timing.className='smallnote';timing.textContent=`Active answer time: ${clockLabel(entry.answer_elapsed_seconds||0)} · ${entry.response_status||'answered'}`;box.appendChild(timing);
     const note=document.createElement('p');note.textContent=entry.assessment||'Not assessed';box.appendChild(note);
     body.appendChild(box);
   }

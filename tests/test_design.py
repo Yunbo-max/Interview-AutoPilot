@@ -15,7 +15,7 @@ SKILL = ROOT / 'skills' / 'ai-interview'
 REFS = ['start-and-contract', 'session-and-clock', 'adversarial-engine',
         'multimodal', 'speech-assessment', 'coding', 'mathematics',
         'research-and-resume', 'evaluation-and-report', 'tool-contracts',
-        'privacy-and-security', 'host-adapters', 'failure-recovery']
+        'privacy-and-security', 'host-adapters', 'failure-recovery', 'timekeeper-agent']
 
 
 def load(path):

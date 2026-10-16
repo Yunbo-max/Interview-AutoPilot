@@ -68,6 +68,11 @@
       <div class="question-header"><span class="eyebrow">INTERVIEWER / <span id="question-id">QUESTION 01</span></span><div class="answer-actions"><button id="replay" class="minimal">↻ Play question</button><button id="pause" class="minimal">Pause</button><button id="finish" class="minimal warning">End interview</button></div></div>
       <h2 id="question-text" aria-live="polite">Your interview starts here.</h2>
       <div id="question-mode" class="mode-chip">SPOKEN ANSWER</div>
+      <section class="timekeeper-panel" aria-label="Local timekeeper supervision">
+        <div class="timekeeper-header"><span class="step-index">LOCAL TIMEKEEPER · NO EXTRA LLM</span><strong id="question-elapsed" class="tabnums">00:00 / 05:00 GUIDE</strong></div>
+        <div class="timekeeper-track"><div id="question-progress"></div></div>
+        <div class="timekeeper-footer"><p id="timekeeper-note" aria-live="polite">The clock measures time since the question was asked, not microphone silence. Your thinking time is not a score.</p><div class="timekeeper-actions"><button id="more-time" class="minimal" type="button">+1 minute</button><button id="skip-question" class="minimal" type="button">Skip question ↗</button></div></div>
+      </section>
     </div>
     <div class="answer-layout">
       <section id="voice-panel" class="answer-card">
@@ -86,7 +91,7 @@
     </div>
     <div class="submit-row"><p id="submit-hint" class="smallnote">Your answer is not sent until you click Submit.</p><button id="submit" class="primary">SUBMIT ANSWER <span>→</span></button></div>
   </section>
-  <section id="review" class="review-screen" hidden><div class="eyebrow">SESSION COMPLETE / 03</div><h1>Evidence,<br><em>not impressions.</em></h1><p>Questions and answers are shown below. Evaluations are model-generated, not independently certified; candidate code was not executed.</p><div id="review-body"></div><section class="review-entry"><strong>REFERENCE ANSWERS / 模型参考解</strong><pre id="reference-solutions"></pre></section><button id="download-review" class="primary">Export report JSON ↓</button> <button id="save-memory" class="minimal">Save private memory summary (no raw answers)</button><p class="smallnote">This is optional. It saves role, answered phases and counts only, not the resume, audio or full transcript.</p></section>
+  <section id="review" class="review-screen" hidden><div class="eyebrow">SESSION COMPLETE / 03</div><h1>Evidence,<br><em>not impressions.</em></h1><p>Questions and answers are shown below. Evaluations are model-generated, not independently certified; candidate code was not executed.</p><p id="timing-summary" class="smallnote">Per-question active time and explicit skips are recorded without grading thinking speed.</p><div id="review-body"></div><section class="review-entry"><strong>REFERENCE ANSWERS / 模型参考解</strong><pre id="reference-solutions"></pre></section><button id="download-review" class="primary">Export report JSON ↓</button> <button id="save-memory" class="minimal">Save private memory summary (no raw answers)</button><p class="smallnote">This is optional. It saves role, answered phases and counts only, not the resume, audio or full transcript.</p></section>
   <p id="notice" role="status" aria-live="polite"></p>
   </main>
   <footer><span>AI INTERVIEW / OPEN SOURCE</span><span>LOCAL FIRST · VOICE FIRST · NO AUTOMATIC RECORDING</span></footer>

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 — Per-question Timekeeper Agent, active-time pacing (2026-10-16)
+
+- Added an independent, deterministic local Timekeeper with active per-question timing and phase-specific advisory reminders (HR 1/2/5 minutes, coding 5/10/15, math/research 2/4/6).
+- The local server loop records reminder events and 55/59-minute session warnings even without browser polls; at 60 active minutes it stops accepting new answers without a new model call. Closed tabs cannot receive audio alerts and do not automatically pause.
+- Added manual extra minute (twice per question) and explicit unassessed skip with question-ID guards, idempotency and reliable retry on model failure. No automatic skipping, silence/acoustic judgment or timing-based skill scoring.
+- Pause intervals, interviewer-model execution, and bound Whisper/VoiceStudio transcription waits are excluded from candidate active time. Candidate speech/typing/thinking remain accounted for. Reports contain a timing ledger with skipped/unanswered distinctions; optional long-term Memory still saves condensed coverage rather than transcripts.
+- Added a compact Timekeeper display and local browser reminders, coding visual-only policy and tests. No new model provider, always-on microphone, workflows or GitHub Actions.
+- Real-device 60-minute endurance, browser/system sleeping, model latency and audio quality remain unverified.
+
 ## 0.6.0 — Mac one-click setup and local Agent launch (2026-10-16)
 
 - Added `AI-Interview.command` and a self-contained `one-click-mac.sh` / `mac_bootstrap.py` flow usable by local Codex, Claude Code, Gemini CLI and Finder.

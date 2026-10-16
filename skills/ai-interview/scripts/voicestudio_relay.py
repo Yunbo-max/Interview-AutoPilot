@@ -94,6 +94,7 @@ class VoiceStudioRelay:
             await client.send(json.dumps({'type':'error','message':'Another candidate recording is already active.'}))
             await client.close(code=1008)
             return
+        hold_token=None
         try:
             # proxy=None prevents proxy settings from redirecting local mic audio.
             async with connect(self.backend.websocket_upstream, proxy=None,
@@ -103,6 +104,7 @@ class VoiceStudioRelay:
                 created = time.monotonic()
 
                 async def input_forward():
+                    nonlocal hold_token
                     total = 0
                     async for msg in client:
                         if not self._valid_question(qid):
@@ -117,6 +119,11 @@ class VoiceStudioRelay:
                         else:
                             command=json.loads(msg)
                             if command == {'type':'input_audio.end'}:
+                                # Stop candidate time while waiting for the final ASR summary.
+                                # This operation cannot initiate a microphone recording.
+                                hold_token=self.state.interview.begin_host_wait(qid,'stt_stream')
+                                if hold_token is None:
+                                    raise ValueError('Stale spoken question while finalizing the transcript')
                                 await upstream.send(msg)
                                 # Wait for the upstream summary; never turn a partial into final.
                                 await asyncio.Event().wait()
@@ -125,6 +132,7 @@ class VoiceStudioRelay:
                             raise ValueError('Unsupported microphone control')
 
                 async def output_forward():
+                    nonlocal hold_token
                     async for msg in upstream:
                         if not self._valid_question(qid):
                             raise ValueError('Question changed during transcription')
@@ -143,6 +151,12 @@ class VoiceStudioRelay:
                             safe['final_kind']=data.get('final_kind','summary') if data.get('final_kind') in ('utterance','summary') else 'utterance'
                         if kind=='error':
                             safe['message']='VoiceStudio reported a transcription error; retry or use batch input.'
+                        if kind=='final' and safe.get('final_kind')=='summary':
+                            # The client may submit immediately on receiving the summary.
+                            # Release the processing hold before handing it over; the outer
+                            # finally still releases on errors or disconnects.
+                            self.state.interview.end_host_wait(hold_token)
+                            hold_token=None
                         await client.send(json.dumps(safe,ensure_ascii=False))
                         if kind=='final' and safe['final_kind']=='summary':return
                         if kind=='error':return
@@ -165,6 +179,7 @@ class VoiceStudioRelay:
                     'message':'VoiceStudio stream interrupted. You may retry or switch to batch transcription.'}))
             except Exception:pass
         finally:
+            self.state.interview.end_host_wait(hold_token)
             self._active_lock.release()
             try:await client.close()
             except Exception:pass

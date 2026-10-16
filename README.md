@@ -1,4 +1,4 @@
-# AI Interview · 0.5.0
+# AI Interview · 0.6.0
 
 **Build a defensible CV. Find and rank relevant jobs. Practice demanding voice-first technical interviews. Remember what you demonstrated and what has changed in the field.**
 
@@ -7,6 +7,49 @@ This project focuses on the interview and research-learning lifecycle, **with no
 `/profile → /scrape → /rank → /interview → /memory` — with optional `/trends` research freshness checks before and during technical interview preparation.
 
 [中文说明](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Career workflow](skills/ai-interview/references/career-workflow.md) · [Evidence/verification](docs/CAREER-VERIFICATION.md)
+
+## One-click MacBook Pro setup (new in 0.6.0)
+
+The entire native setup/launch flow is now callable by **local Codex, Claude Code,
+Gemini CLI, or Finder on an Apple Silicon Mac**. No GitHub Actions, cloud setup
+agent or remote desktop access is required.
+
+```bash
+# From a cloned AI-Interview repository on your own Mac:
+bash AI-Interview.command --yes
+```
+
+Or **double-click `AI-Interview.command`** in Finder for interactive download
+approval. The command installs a private Python virtual environment and offline
+Whisper base fallback; on Apple Silicon it can download and SHA256-verify the
+**official separate VoiceStudio ARM64 DMG**, then install into
+`~/Applications/VoiceStudio.app`. It registers a single canonical installed
+Skill using symlinks for Codex/Claude and starts the local browser studio **in
+the background**, returning promptly to the Agent shell. It reuses a running
+session instead of duplicating it.
+
+On a clean Mac without Python 3.10+, the shell wrapper uses existing uv/Homebrew
+or a pinned, SHA256-verified official uv binary to install Python 3.11; no
+remote `curl | sh`, sudo or disabling macOS Gatekeeper. Intel Macs retain the
+Whisper/browser-TTS fallback because upstream VoiceStudio's local backend is
+unsupported there.
+
+```bash
+bash AI-Interview.command --doctor        # inspect setup without changing files
+bash AI-Interview.command --dry-run       # see planned downloads, no changes
+bash AI-Interview.command --launch-only   # re-open the same running interview
+bash AI-Interview.command --stop          # authenticated local shutdown
+bash AI-Interview.command --no-voicestudio --yes # lightweight, no separate app
+```
+
+**Explicit controls remain:** the VoiceStudio app may require a first-run
+setup, extra licensed models, and macOS Gatekeeper approval; a browser microphone
+permission and separate opt-in for VoiceStudio/model-provider use cannot be
+automated away. The shell does not install or log into seven model providers.
+Use an already authenticated Codex/Claude/Gemini CLI, or configure the supported
+model API key yourself. Session state remains in process memory; export before
+stopping. [Complete Mac installer/Agent guide](skills/ai-interview/references/one-click-mac.md)
+· [Implementation details](docs/ONE-CLICK-MAC-INTEGRATION.md).
 
 ## New in 0.5.0: optional VoiceStudio speech backend
 

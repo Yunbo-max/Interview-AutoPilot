@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 — Mac one-click setup and local Agent launch (2026-10-16)
+
+- Added `AI-Interview.command` and a self-contained `one-click-mac.sh` / `mac_bootstrap.py` flow usable by local Codex, Claude Code, Gemini CLI and Finder.
+- Automatically prepares an isolated Python environment, installs the voice/studio dependencies, and downloads multilingual Whisper base with explicit installation approval. Modern Python can be bootstrapped with a pinned SHA256-verified uv binary if not installed.
+- Added independent VoiceStudio ARM64 DMG installation on Apple Silicon with strict official GitHub release asset URL, version, file size and SHA256 checks. Never vendors AGPL software or accepts third-party model licenses silently.
+- Symlinks the complete Skill for local agent discovery, backing up existing installations rather than deleting them.
+- Launches a private localhost studio in a detached process so Agent tools return promptly; reuses live sessions and uses a token-authenticated shutdown endpoint instead of killing persisted PIDs.
+- Added read-only doctor/dry-run, safe lightweight mode and local tests; Mac hardware, Gatekeeper and speech models remain to be tested on a physical MacBook.
+
+
 ## 0.5.0 — Optional external VoiceStudio STT/TTS integration (2026-10-16)
 
 - Added loopback-only VoiceStudio capability discovery, optional HTTP TTS and batch STT, plus a same-host authenticated WebSocket relay for streaming partial/final transcriptions.

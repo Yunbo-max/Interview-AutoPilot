@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SKILL=ROOT/'skills/ai-interview'
 class PackagingTests(unittest.TestCase):
     def test_version_and_entrypoints(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'0.5.0')
+        self.assertRegex((ROOT/'VERSION').read_text().strip(), r'^\d+\.\d+\.\d+$')
         self.assertTrue((SKILL/'scripts/career.py').is_file())
         self.assertTrue((SKILL/'references/career-workflow.md').is_file())
         self.assertIn('career-workflow.md',(SKILL/'SKILL.md').read_text())

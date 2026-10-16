@@ -34,6 +34,15 @@ class HttpTests(unittest.TestCase):
         except Exception:data=raw
         return status,data
 
+    def test_authenticated_one_click_shutdown(self):
+        status,_=self.req('POST','/api/shutdown',body=b'',auth=False)
+        self.assertEqual(status,403)
+        status,data=self.req('POST','/api/shutdown',body=b'')
+        self.assertEqual(status,200)
+        self.assertEqual(data['status'],'stopping')
+        self.thread.join(timeout=2)
+        self.assertFalse(self.thread.is_alive())
+
     def test_no_upload_or_session_automatically(self):
         status,data=self.req('GET','/api/state')
         self.assertEqual(status,200);self.assertFalse(data['resume_loaded']);self.assertEqual(data['status'],'setup')

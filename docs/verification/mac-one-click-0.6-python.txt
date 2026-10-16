@@ -1,0 +1,187 @@
+test_arxiv_refresh_records_real_source_metadata_fixture (test_career_cli.CareerCLITests.test_arxiv_refresh_records_real_source_metadata_fixture) ... ok
+test_interview_forwards_optional_voicestudio_flags (test_career_cli.CareerCLITests.test_interview_forwards_optional_voicestudio_flags) ... ok
+test_linkedin_is_link_generation_not_a_scraper (test_career_cli.CareerCLITests.test_linkedin_is_link_generation_not_a_scraper) ... ok
+test_no_apply_command_and_no_auto_application (test_career_cli.CareerCLITests.test_no_apply_command_and_no_auto_application) ... ok
+test_profile_external_polish_requires_separate_permission (test_career_cli.CareerCLITests.test_profile_external_polish_requires_separate_permission) ... ok
+test_profile_scrape_rank_memory_round_trip (test_career_cli.CareerCLITests.test_profile_scrape_rank_memory_round_trip) ... ok
+test_trend_fetch_failure_never_claims_freshness (test_career_cli.CareerCLITests.test_trend_fetch_failure_never_claims_freshness) ... ok
+test_cross_host_contract_is_honest (test_career_packaging.PackagingTests.test_cross_host_contract_is_honest) ... ok
+test_private_workspace_is_gitignored (test_career_packaging.PackagingTests.test_private_workspace_is_gitignored) ... ok
+test_version_and_entrypoints (test_career_packaging.PackagingTests.test_version_and_entrypoints) ... ok
+test_briefing_only_non_hr_phase_and_never_diagnoses_forgetting (test_career_studio_integration.BriefTests.test_briefing_only_non_hr_phase_and_never_diagnoses_forgetting) ... ok
+test_explicit_flags_attach_only_cached_briefing (test_career_studio_integration.StudioEvidenceTests.test_explicit_flags_attach_only_cached_briefing) ... ok
+test_invalid_paper_feed_fails_cleanly_without_fake_freshness (test_career_studio_integration.StudioEvidenceTests.test_invalid_paper_feed_fails_cleanly_without_fake_freshness) ... ok
+test_memory_export_rejected_while_not_completed (test_career_studio_integration.StudioEvidenceTests.test_memory_export_rejected_while_not_completed) ... ok
+test_research_refresh_requires_explicit_click_and_uses_fixed_host (test_career_studio_integration.StudioEvidenceTests.test_research_refresh_requires_explicit_click_and_uses_fixed_host) ... ok
+test_review_memory_write_requires_explicit_user_request (test_career_studio_integration.StudioEvidenceTests.test_review_memory_write_requires_explicit_user_request) ... ok
+test_selected_ranked_job_shapes_hr_questions_without_fabrication (test_career_studio_integration.StudioEvidenceTests.test_selected_ranked_job_shapes_hr_questions_without_fabrication) ... ok
+test_studio_evidence_status_no_remote_fetch (test_career_studio_integration.StudioEvidenceTests.test_studio_evidence_status_no_remote_fetch) ... ok
+test_unknown_job_selection_rejected (test_career_studio_integration.StudioEvidenceTests.test_unknown_job_selection_rejected) ... ok
+test_all_roles_have_independent_topic_keywords (test_career_workflow.CareerTests.test_all_roles_have_independent_topic_keywords) ... ok
+test_arxiv_freshness_and_metadata_are_source_bound (test_career_workflow.CareerTests.test_arxiv_freshness_and_metadata_are_source_bound) ... ok
+test_cached_papers_must_be_retrieved_recently_and_match_role (test_career_workflow.CareerTests.test_cached_papers_must_be_retrieved_recently_and_match_role) ... ok
+test_cv_draft_repeated_saves_never_overwrite_older_work (test_career_workflow.CareerTests.test_cv_draft_repeated_saves_never_overwrite_older_work) ... ok
+test_download_host_whitelist_and_no_redirect_handler (test_career_workflow.CareerTests.test_download_host_whitelist_and_no_redirect_handler) ... ok
+test_greenhouse_published_jobs_normalization (test_career_workflow.CareerTests.test_greenhouse_published_jobs_normalization) ... ok
+test_hf_curated_signal_is_observed_not_guessed (test_career_workflow.CareerTests.test_hf_curated_signal_is_observed_not_guessed) ... ok
+test_html_script_not_passed_into_job_description (test_career_workflow.CareerTests.test_html_script_not_passed_into_job_description) ... ok
+test_invalid_role_and_malicious_job_url_rejected (test_career_workflow.CareerTests.test_invalid_role_and_malicious_job_url_rejected) ... ok
+test_job_import_dedup_and_explainable_rank (test_career_workflow.CareerTests.test_job_import_dedup_and_explainable_rank) ... ok
+test_lever_job_normalization (test_career_workflow.CareerTests.test_lever_job_normalization) ... ok
+test_linkedin_query_only_never_scrapes (test_career_workflow.CareerTests.test_linkedin_query_only_never_scrapes) ... ok
+test_memory_is_evidence_not_forgetting_diagnosis (test_career_workflow.CareerTests.test_memory_is_evidence_not_forgetting_diagnosis) ... ok
+test_profile_preserves_evidence_draft_not_fake_achievements (test_career_workflow.CareerTests.test_profile_preserves_evidence_draft_not_fake_achievements) ... ok
+test_report_import_does_not_store_raw_answers (test_career_workflow.CareerTests.test_report_import_does_not_store_raw_answers) ... ok
+test_stale_papers_never_recast_as_current (test_career_workflow.CareerTests.test_stale_papers_never_recast_as_current) ... ok
+test_workspace_private_and_no_implicit_writes (test_career_workflow.CareerTests.test_workspace_private_and_no_implicit_writes) ... ok
+test_coding_mutant_is_detected (test_design.DesignTests.test_coding_mutant_is_detected) ... ok
+test_coding_reference_exhaustive (test_design.DesignTests.test_coding_reference_exhaustive) ... ok
+test_contract_schema (test_design.DesignTests.test_contract_schema) ... ok
+test_default_clock_and_consent (test_design.DesignTests.test_default_clock_and_consent) ... ok
+test_invalid_contracts_rejected (test_design.DesignTests.test_invalid_contracts_rejected) ... ok
+test_local_markdown_links (test_design.DesignTests.test_local_markdown_links) ... ok
+test_required_files (test_design.DesignTests.test_required_files) ... ok
+test_role_boundary (test_design.DesignTests.test_role_boundary) ... ok
+test_sample_variance_finite_distribution_sanity (test_design.DesignTests.test_sample_variance_finite_distribution_sanity) ... ok
+test_scenarios_are_not_fabricated_runs (test_design.DesignTests.test_scenarios_are_not_fabricated_runs) ... ok
+test_skill_links_stay_self_contained (test_design.DesignTests.test_skill_links_stay_self_contained) ... ok
+test_skill_metadata_and_size (test_design.DesignTests.test_skill_metadata_and_size) ... ok
+test_speech_without_audio_rejected (test_design.DesignTests.test_speech_without_audio_rejected) ... ok
+test_version_consistency (test_design.DesignTests.test_version_consistency) ... ok
+test_accepts_only_our_local_url_and_token (test_mac_one_click.DaemonContractTests.test_accepts_only_our_local_url_and_token) ... ok
+test_graceful_shutdown_endpoint_and_authenticated_session (test_mac_one_click.DaemonContractTests.test_graceful_shutdown_endpoint_and_authenticated_session) ... ok
+test_refuses_invalid_session_metadata (test_mac_one_click.DaemonContractTests.test_refuses_invalid_session_metadata) ... ok
+test_reuses_valid_server_without_launching_duplicate (test_mac_one_click.DaemonContractTests.test_reuses_valid_server_without_launching_duplicate) ... ok
+test_script_agents_return_after_launch (test_mac_one_click.DaemonContractTests.test_script_agents_return_after_launch) ... ok
+test_bash_invocation_of_finder_command_reaches_platform_gate (test_mac_one_click.OneClickTests.test_bash_invocation_of_finder_command_reaches_platform_gate) ... ok
+test_checksum_parser_accepts_only_exact_filename (test_mac_one_click.OneClickTests.test_checksum_parser_accepts_only_exact_filename) ... ok
+test_checksum_verification_rejects_wrong_file (test_mac_one_click.OneClickTests.test_checksum_verification_rejects_wrong_file) ... ok
+test_dry_run_has_no_writes_or_external_calls (test_mac_one_click.OneClickTests.test_dry_run_has_no_writes_or_external_calls) ... ok
+test_intel_cannot_install_voicestudio_locally (test_mac_one_click.OneClickTests.test_intel_cannot_install_voicestudio_locally) ... ok
+test_mac_wrapper_and_agent_instructions_exist (test_mac_one_click.OneClickTests.test_mac_wrapper_and_agent_instructions_exist) ... ok
+test_minimum_voice_studio_macos_version (test_mac_one_click.OneClickTests.test_minimum_voice_studio_macos_version) ... ok
+test_official_urls_not_remote_shell_execution (test_mac_one_click.OneClickTests.test_official_urls_not_remote_shell_execution) ... ok
+test_portable_skill_can_dry_run_without_repository (test_mac_one_click.OneClickTests.test_portable_skill_can_dry_run_without_repository) ... ok
+test_rejects_untrusted_asset_and_unstable_tag (test_mac_one_click.OneClickTests.test_rejects_untrusted_asset_and_unstable_tag) ... ok
+test_release_metadata_allowlist (test_mac_one_click.OneClickTests.test_release_metadata_allowlist) ... ok
+test_simulated_official_dmg_install_is_checksummed_and_no_sudo (test_mac_one_click.OneClickTests.test_simulated_official_dmg_install_is_checksummed_and_no_sudo) ... [VoiceStudio] Downloading the official v0.5.6 ARM64 DMG (20 MB); verifying SHA256…
+ok
+test_skill_links_never_overwrite_without_optin (test_mac_one_click.OneClickTests.test_skill_links_never_overwrite_without_optin) ... ok
+test_standalone_skill_path_detection (test_mac_one_click.OneClickTests.test_standalone_skill_path_detection) ... ok
+test_agent_launch_returns_without_waiting_for_the_interview (test_mac_one_click.RunningLocalStudioTests.test_agent_launch_returns_without_waiting_for_the_interview) ... [AI Interview] No local Codex/Claude/Gemini CLI detected. You may configure a supported API key in the same terminal environment.
+[AI Interview] Starting a private localhost studio. This returns control to your CLI Agent.
+[AI Interview] Interview studio is running on 127.0.0.1. It requires an explicit browser microphone click.
+[AI Interview] To stop the local service, run the same launcher with --stop.
+[AI Interview] Reusing your already-running private interview, not starting a duplicate server.
+[AI Interview] Interview studio shutdown requested. Close the browser tab to release any open microphone.
+ok
+test_authenticated_shutdown_round_trip_via_real_local_http (test_mac_one_click.RunningLocalStudioTests.test_authenticated_shutdown_round_trip_via_real_local_http) ... [AI Interview] Interview studio shutdown requested. Close the browser tab to release any open microphone.
+ok
+test_bad_audio_reports_error (test_mic_stt.AdapterTests.test_bad_audio_reports_error) ... ok
+test_bad_token (test_mic_stt.AdapterTests.test_bad_token) ... ok
+test_empty_audio_denied (test_mic_stt.AdapterTests.test_empty_audio_denied) ... ok
+test_empty_text_denied (test_mic_stt.AdapterTests.test_empty_text_denied) ... ok
+test_foreign_host (test_mic_stt.AdapterTests.test_foreign_host) ... ok
+test_foreign_origin (test_mic_stt.AdapterTests.test_foreign_origin) ... ok
+test_health (test_mic_stt.AdapterTests.test_health) ... ok
+test_invalid_json_denied (test_mic_stt.AdapterTests.test_invalid_json_denied) ... ok
+test_lock_rejects_parallel_transcription (test_mic_stt.AdapterTests.test_lock_rejects_parallel_transcription) ... ok
+test_no_save_on_transcribe (test_mic_stt.AdapterTests.test_no_save_on_transcribe) ... ok
+test_repeated_identical_save_is_idempotent (test_mic_stt.AdapterTests.test_repeated_identical_save_is_idempotent) ... ok
+test_save_preserves_raw_and_confirmed (test_mic_stt.AdapterTests.test_save_preserves_raw_and_confirmed) ... ok
+test_save_unknown_draft_denied (test_mic_stt.AdapterTests.test_save_unknown_draft_denied) ... ok
+test_static_routes_are_allowlisted (test_mic_stt.AdapterTests.test_static_routes_are_allowlisted) ... ok
+test_token_not_served_in_html (test_mic_stt.AdapterTests.test_token_not_served_in_html) ... ok
+test_unsupported_language_denied (test_mic_stt.AdapterTests.test_unsupported_language_denied) ... ok
+test_wrong_content_type_denied (test_mic_stt.AdapterTests.test_wrong_content_type_denied) ... ok
+test_invalid_submission_metadata_is_rejected (test_review_regressions.ReviewRegressions.test_invalid_submission_metadata_is_rejected) ... ok
+test_malformed_connection_is_a_clear_validation_error (test_review_regressions.ReviewRegressions.test_malformed_connection_is_a_clear_validation_error) ... ok
+test_new_submission_can_deliberately_restore_earlier_text (test_review_regressions.ReviewRegressions.test_new_submission_can_deliberately_restore_earlier_text) ... ok
+test_nonascii_authorization_is_rejected_without_handler_crash (test_review_regressions.ReviewRegressions.test_nonascii_authorization_is_rejected_without_handler_crash) ... ok
+test_replayed_confirmation_does_not_undo_correction (test_review_regressions.ReviewRegressions.test_replayed_confirmation_does_not_undo_correction) ... ok
+test_stale_new_submission_cannot_overwrite_a_correction (test_review_regressions.ReviewRegressions.test_stale_new_submission_cannot_overwrite_a_correction) ... ok
+test_stopped_session_never_delivers_ready_answer (test_review_regressions.ReviewRegressions.test_stopped_session_never_delivers_ready_answer) ... ok
+test_submission_id_is_immutable (test_review_regressions.ReviewRegressions.test_submission_id_is_immutable) ... ok
+test_clock_pause_hold_does_not_advance (test_studio_core.CoreTests.test_clock_pause_hold_does_not_advance) ... ok
+test_code_submission_is_not_executed (test_studio_core.CoreTests.test_code_submission_is_not_executed) ... ok
+test_completed_review_survives_page_refresh_in_memory (test_studio_core.CoreTests.test_completed_review_survives_page_refresh_in_memory) ... ok
+test_curriculum_roles_and_minute_totals (test_studio_core.CoreTests.test_curriculum_roles_and_minute_totals) ... ok
+test_deadline_does_not_trigger_new_model_call (test_studio_core.CoreTests.test_deadline_does_not_trigger_new_model_call) ... ok
+test_engine_consented_start_adaptive_and_code (test_studio_core.CoreTests.test_engine_consented_start_adaptive_and_code) ... ok
+test_failed_model_submission_is_retryable (test_studio_core.CoreTests.test_failed_model_submission_is_retryable) ... ok
+test_language_and_review_instructions (test_studio_core.CoreTests.test_language_and_review_instructions) ... ok
+test_pdf_extract_valid_and_reject_invalid (test_studio_core.CoreTests.test_pdf_extract_valid_and_reject_invalid) ... ok
+test_authenticated_one_click_shutdown (test_studio_http.HttpTests.test_authenticated_one_click_shutdown) ... ok
+test_denies_foreign_origin_bad_token (test_studio_http.HttpTests.test_denies_foreign_origin_bad_token) ... ok
+test_no_upload_or_session_automatically (test_studio_http.HttpTests.test_no_upload_or_session_automatically) ... ok
+test_pdf_then_start_then_voice_answer (test_studio_http.HttpTests.test_pdf_then_start_then_voice_answer) ... ok
+test_upload_rejects_other_content (test_studio_http.HttpTests.test_upload_rejects_other_content) ... ok
+test_without_speech_falls_back_to_typing (test_studio_http.HttpTests.test_without_speech_falls_back_to_typing) ... ok
+test_all_four_api_transports_fixed_endpoints (test_studio_models.ModelTests.test_all_four_api_transports_fixed_endpoints) ... ok
+test_cli_invokes_argument_array_not_shell (test_studio_models.ModelTests.test_cli_invokes_argument_array_not_shell) ... ok
+test_excessive_prompt_or_invalid_response (test_studio_models.ModelTests.test_excessive_prompt_or_invalid_response) ... ok
+test_json_extraction_rejects_prose (test_studio_models.ModelTests.test_json_extraction_rejects_prose) ... ok
+test_supported_providers_and_missing_keys (test_studio_models.ModelTests.test_supported_providers_and_missing_keys) ... ok
+test_no_workflow_files (test_voice_bridge.PackageVoiceTests.test_no_workflow_files) ... ok
+test_self_contained_runtime_files (test_voice_bridge.PackageVoiceTests.test_self_contained_runtime_files) ... ok
+test_skill_routes_to_real_commands (test_voice_bridge.PackageVoiceTests.test_skill_routes_to_real_commands) ... ok
+test_copied_skill_runs_outside_repo (test_voice_bridge.PortableVoiceTests.test_copied_skill_runs_outside_repo) ... ok
+test_real_start_stop_lifecycle_with_fake_model (test_voice_bridge.PortableVoiceTests.test_real_start_stop_lifecycle_with_fake_model) ... ok
+test_setup_requires_download_permission (test_voice_bridge.PortableVoiceTests.test_setup_requires_download_permission) ... ok
+test_browser_question_endpoint (test_voice_bridge.VoiceTests.test_browser_question_endpoint) ... ok
+test_cli_ask_and_http_transcribe_confirm_round_trip (test_voice_bridge.VoiceTests.test_cli_ask_and_http_transcribe_confirm_round_trip) ... ok
+test_correction_is_new_revision (test_voice_bridge.VoiceTests.test_correction_is_new_revision) ... ok
+test_exact_question_revision_and_idempotency (test_voice_bridge.VoiceTests.test_exact_question_revision_and_idempotency) ... ok
+test_invalid_wait_limits_are_rejected (test_voice_bridge.VoiceTests.test_invalid_wait_limits_are_rejected) ... ok
+test_metadata_cannot_redirect_local_tokens (test_voice_bridge.VoiceTests.test_metadata_cannot_redirect_local_tokens) ... ok
+test_new_question_does_not_return_previous_answer (test_voice_bridge.VoiceTests.test_new_question_does_not_return_previous_answer) ... ok
+test_no_answer_until_confirmed (test_voice_bridge.VoiceTests.test_no_answer_until_confirmed) ... ok
+test_pending_question_cannot_be_silently_replaced (test_voice_bridge.VoiceTests.test_pending_question_cannot_be_silently_replaced) ... ok
+test_question_id_validation (test_voice_bridge.VoiceTests.test_question_id_validation) ... ok
+test_round_trip_confirmed_record_on_disk (test_voice_bridge.VoiceTests.test_round_trip_confirmed_record_on_disk) ... ok
+test_same_question_is_idempotent_but_not_mutable (test_voice_bridge.VoiceTests.test_same_question_is_idempotent_but_not_mutable) ... ok
+test_stale_draft_cannot_be_submitted_to_next_question (test_voice_bridge.VoiceTests.test_stale_draft_cannot_be_submitted_to_next_question) ... ok
+test_stale_recording_header_rejected (test_voice_bridge.VoiceTests.test_stale_recording_header_rejected) ... ok
+test_start_refuses_existing_session (test_voice_bridge.VoiceTests.test_start_refuses_existing_session) ... ok
+test_stop_marks_state_and_shuts_down (test_voice_bridge.VoiceTests.test_stop_marks_state_and_shuts_down) ... ok
+test_wait_cli_returns_data_not_shell_instructions (test_voice_bridge.VoiceTests.test_wait_cli_returns_data_not_shell_instructions) ... ok
+test_wait_timeout_is_not_empty_answer (test_voice_bridge.VoiceTests.test_wait_timeout_is_not_empty_answer) ... ok
+test_stream_proxy_reports_partials_only_final_summary (test_voicestudio_adapter.SpeechRelayTests.test_stream_proxy_reports_partials_only_final_summary) ... ok
+test_stream_session_requires_private_token_and_question (test_voicestudio_adapter.SpeechRelayTests.test_stream_session_requires_private_token_and_question) ... opening handshake failed
+Traceback (most recent call last):
+  File "/opt/pyvenv/lib/python3.13/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+    ...<3 lines>...
+    )
+  File "/opt/pyvenv/lib/python3.13/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/pyvenv/lib/python3.13/site-packages/websockets/server.py", line 140, in accept
+    ) = self.process_request(request)
+        ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/opt/pyvenv/lib/python3.13/site-packages/websockets/server.py", line 271, in process_request
+    self.origin = self.process_origin(headers)
+                  ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/opt/pyvenv/lib/python3.13/site-packages/websockets/server.py", line 309, in process_origin
+    raise InvalidOrigin(origin)
+websockets.exceptions.InvalidOrigin: invalid Origin header: https://attacker.invalid
+ok
+test_batch_voice_backend_optin_does_not_require_local_whisper (test_voicestudio_adapter.StudioBridgeHttpTests.test_batch_voice_backend_optin_does_not_require_local_whisper) ... ok
+test_relay_csp_allows_only_verified_loopback_port (test_voicestudio_adapter.StudioBridgeHttpTests.test_relay_csp_allows_only_verified_loopback_port) ... ok
+test_status_endpoint_is_private_and_side_effect_free (test_voicestudio_adapter.StudioBridgeHttpTests.test_status_endpoint_is_private_and_side_effect_free) ... ok
+test_tts_rejects_unsanctioned_text_and_wrong_turn (test_voicestudio_adapter.StudioBridgeHttpTests.test_tts_rejects_unsanctioned_text_and_wrong_turn) ... ok
+test_tts_speaks_only_matching_active_spoken_question (test_voicestudio_adapter.StudioBridgeHttpTests.test_tts_speaks_only_matching_active_spoken_question) ... ok
+test_accepts_only_loopback_and_fixed_transport (test_voicestudio_adapter.VoiceStudioAdapterTests.test_accepts_only_loopback_and_fixed_transport) ... ok
+test_batch_stt_uses_multipart_only_on_explicit_recording (test_voicestudio_adapter.VoiceStudioAdapterTests.test_batch_stt_uses_multipart_only_on_explicit_recording) ... ok
+test_discovers_server_capabilities_and_voices (test_voicestudio_adapter.VoiceStudioAdapterTests.test_discovers_server_capabilities_and_voices) ... ok
+test_generates_wav_only_from_bounded_text (test_voicestudio_adapter.VoiceStudioAdapterTests.test_generates_wav_only_from_bounded_text) ... ok
+test_rejects_wrong_capability_protocol (test_voicestudio_adapter.VoiceStudioAdapterTests.test_rejects_wrong_capability_protocol) ... ok
+test_unavailable_returns_safe_status_not_a_success (test_voicestudio_adapter.VoiceStudioAdapterTests.test_unavailable_returns_safe_status_not_a_success) ... ok
+test_docs_include_no_auto_download_and_privacy_boundaries (test_voicestudio_packaging.VoiceStudioPackagingTests.test_docs_include_no_auto_download_and_privacy_boundaries) ... ok
+test_no_third_party_source_bundled (test_voicestudio_packaging.VoiceStudioPackagingTests.test_no_third_party_source_bundled) ... ok
+test_self_contained_skill_installs_without_upstream (test_voicestudio_packaging.VoiceStudioPackagingTests.test_self_contained_skill_installs_without_upstream) ... ok
+test_versions_match_with_optional_adapter (test_voicestudio_packaging.VoiceStudioPackagingTests.test_versions_match_with_optional_adapter) ... ok
+
+----------------------------------------------------------------------
+Ran 157 tests in 11.582s
+
+OK

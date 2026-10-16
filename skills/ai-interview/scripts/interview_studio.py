@@ -23,7 +23,7 @@ from career import (CareerWorkspace, briefing_for_role, memory_brief, topic_revi
     get_public_bytes, arxiv_search_url, parse_arxiv_feed, parse_hf_daily, HF_BASE, utcnow)
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '0.5.0'
+VERSION = '0.6.0'
 
 
 class StudioState(AppState):
@@ -114,6 +114,12 @@ class StudioHandler(LocalHandler):
     def do_POST(self):
         if not self.authorized(True):return
         path=urlsplit(self.path).path
+        if path=='/api/shutdown':
+            # Private one-click launcher stops only its own authenticated localhost service.
+            # Never accept a remote address or kill a PID supplied by a file.
+            self.json(200,{'status':'stopping'})
+            threading.Thread(target=self.server.shutdown,daemon=True).start()
+            return
         if path=='/api/resume':
             if self.headers.get('Content-Type','').split(';')[0].strip().lower()!='application/pdf':
                 self.json(415,{'error':'Upload a PDF file (application/pdf)'});return

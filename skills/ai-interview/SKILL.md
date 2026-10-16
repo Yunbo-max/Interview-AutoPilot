@@ -17,6 +17,16 @@ description: Use when a candidate wants a grounded CV/profile, role-focused job 
 
 Keep personal material and keys private. No Actions, workflows, or extra branches.
 
+## First-time local macOS launch
+
+When the candidate explicitly requests one-click installation/launch on their
+Mac, read [one-click Mac installer](references/one-click-mac.md). A local agent
+may run `bash "$SKILL_DIR/scripts/one-click-mac.sh" --yes` only with the
+candidate's explicit install/download approval. The launcher installs the
+Skill links, private Python runtime and optionally a **separately licensed**
+VoiceStudio app from SHA256-verified official DMG; it never grants mic access,
+installs model-provider credentials or suppresses macOS Gatekeeper.
+
 ## Voice-first interview — preferred mode
 
 For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). Local shells may run `doctor` then consented `serve`; remote agents cannot access a microphone.

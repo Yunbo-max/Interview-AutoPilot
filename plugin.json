@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ai-interview",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Voice-first AI/Quant interviews, private career workflows, and an optional localhost VoiceStudio speech backend. No automatic applications."
 }

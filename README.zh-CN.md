@@ -1,8 +1,47 @@
-# AI Interview 0.5.0 · 简历、岗位、语音面试与前沿知识追踪
+# AI Interview 0.6.0 · 简历、岗位、语音面试与前沿知识追踪
 
 我们的目标不是做另一个自动投递简历工具，而是**让技术人才持续准备真正有难度、紧贴岗位要求和最新研究进展的面试**。
 
 新工作流：**`/profile → /scrape → /rank → /interview → /memory`**。独立的 `/trends` 用于更新岗位相关论文和技术热点。保留 0.3.0 的本地语音网页、六类岗位、一小时目标阶段规划和七种模型适配方案。
+
+## MacBook Pro 一键安装启动（0.6.0 新增）
+
+现在本地 Codex、Claude Code、Gemini CLI 或 macOS Finder 可以直接执行
+**一条命令**完成安装并启动网页：
+
+```bash
+# 在你的 MacBook Pro 上克隆源码后执行；不要让云端容器代替 Mac 安装
+git clone https://github.com/Yunbo-max/AI-Interview.git
+cd AI-Interview
+bash AI-Interview.command --yes
+```
+
+**也可以在 Finder 双击 `AI-Interview.command`**，并按提示同意网络下载。
+脚本自动检测 Python；如果当前 Mac 只有旧版 Python，会通过已有 uv/Homebrew，
+或下载经过固定 SHA256 校验的官方 uv 二进制来安装 Python 3.11，不需要 sudo
+或远程 `curl | sh` 脚本。随后建立私有虚拟环境、安装 Python 依赖、下载本地
+Faster-Whisper base 备用模型，并给 Codex/Claude 安装完整 Skill 的符号链接。
+M 系列 Mac 如果尚未安装 VoiceStudio，会从官方 GitHub Release 下载**ARM64
+DMG + SHA256SUMS**并在校验后复制到 `~/Applications`。不会复制第三方源码到
+我们 MIT 仓库；Intel Mac 则自动保留原本的 Whisper/浏览器语音。
+
+面试服务会在 Mac 本地后台启动，**让 Agent 的工具调用及时结束**，并自动
+打开私有浏览器页面。重复执行不会开第二个服务：
+
+```bash
+bash AI-Interview.command --doctor          # 环境检查，不改电脑配置
+bash AI-Interview.command --dry-run         # 看会安装什么，不下载
+bash AI-Interview.command --launch-only     # 再次打开现有面试
+bash AI-Interview.command --stop            # 使用令牌安全关闭本地服务
+bash AI-Interview.command --yes --no-voicestudio # 仅轻量 Whisper
+```
+
+需要明确：**Mac 上安装和允许麦克风必须在你的 Mac 上发生**，本 ChatGPT
+无法从云端打开你的麦克风。VoiceStudio 首次启动时的 macOS Gatekeeper
+批准、模型许可证与模型下载设置，及浏览器麦克风权限，都仍需你完成。
+本命令不会替你创建 Qwen、DeepSeek、GLM、Kimi API Key，也不会自动登录
+Codex/Claude/Gemini。默认模型面试调用的是你选定的在线提供商。
+详见 [一键启动与 Agent 指南](skills/ai-interview/references/one-click-mac.md)。
 
 ## 0.5.0：可选 VoiceStudio 实时语音后端
 

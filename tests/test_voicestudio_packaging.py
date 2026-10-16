@@ -11,10 +11,11 @@ SKILL=ROOT/'skills/ai-interview'
 
 class VoiceStudioPackagingTests(unittest.TestCase):
     def test_versions_match_with_optional_adapter(self):
-        for p in (ROOT/'VERSION',SKILL/'VERSION'):
-            self.assertEqual(p.read_text(encoding='utf-8').strip(),'0.5.0')
+        version=(ROOT/'VERSION').read_text(encoding='utf-8').strip()
+        self.assertRegex(version, r'^\d+\.\d+\.\d+$')
+        self.assertEqual((SKILL/'VERSION').read_text(encoding='utf-8').strip(),version)
         for p in (ROOT/'plugin.json',ROOT/'.codex-plugin/plugin.json'):
-            self.assertEqual(json.loads(p.read_text(encoding='utf-8'))['version'],'0.5.0')
+            self.assertEqual(json.loads(p.read_text(encoding='utf-8'))['version'],version)
     def test_self_contained_skill_installs_without_upstream(self):
         for name in ('scripts/voicestudio_adapter.py','scripts/voicestudio_relay.py',
                      'scripts/requirements-voicestudio.txt',

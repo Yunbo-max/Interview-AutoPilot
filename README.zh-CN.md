@@ -1,8 +1,29 @@
-# AI Interview 0.4.0 · 简历、岗位、语音面试与前沿知识追踪
+# AI Interview 0.5.0 · 简历、岗位、语音面试与前沿知识追踪
 
 我们的目标不是做另一个自动投递简历工具，而是**让技术人才持续准备真正有难度、紧贴岗位要求和最新研究进展的面试**。
 
 新工作流：**`/profile → /scrape → /rank → /interview → /memory`**。独立的 `/trends` 用于更新岗位相关论文和技术热点。保留 0.3.0 的本地语音网页、六类岗位、一小时目标阶段规划和七种模型适配方案。
+
+## 0.5.0：可选 VoiceStudio 实时语音后端
+
+**已经加入 VoiceStudio 的协议适配代码、实时语音中继、网页切换和安装说明。** 它是一个**独立安装的第三方程序**，我们不复制它的 AGPL-3.0 源码或模型权重，因此 AI-Interview 仍然保持 MIT 代码仓库。
+
+先从 [VoiceStudio 官方 Releases](https://github.com/debpalash/VoiceStudio/releases/latest) 下载与你操作系统匹配的安装包（核对 SHA-256），打开应用，在它的 Model Manager 内选择并安装 STT/TTS 模型。确认它的后端在本机 `127.0.0.1:3900` 运行。**Intel Mac 无法使用 VoiceStudio 打包的本地 Python 后端**，可以继续使用 AI-Interview 自带的 Faster-Whisper CPU 方案。
+
+在本地 AI-Interview 仓库虚拟环境中执行：
+
+```bash
+python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
+python -m pip install -r skills/ai-interview/scripts/requirements-voicestudio.txt
+python skills/ai-interview/scripts/career.py interview --doctor --voicestudio
+python skills/ai-interview/scripts/career.py interview --without-stt --voicestudio
+```
+
+在面试网页顶部点 **Check VoiceStudio → 明确勾选独立语音服务授权 → Speech Engine 选择 VoiceStudio**，就可以让 AI 用 VoiceStudio 的音频朗读问题，候选人点击录音后使用实时字幕和最后的语音汇总。系统会在你停止录音、人工核对和主动点击提交后，才把文字交给选定面试模型。录音时会停止面试官正在播放的声音；Coding 则继续用编辑器。流式模型不可用时可以回退到 VoiceStudio 批量识别；也可以继续用浏览器朗读和本地 Whisper。
+
+**重要隐私边界：** 我们只把音频交给本机 VoiceStudio 服务；但 VoiceStudio 自身可选远程语音引擎，也可能首次使用时下载模型。你必须先检查它的设置和模型许可证，再在网页授权。与在线 LLM 处理你确认后的答案是两份独立的权限。没有经过你设备的实际语音验证，不能保证流畅度和延迟。
+
+完整逐步操作：**[VoiceStudio 安装和使用说明](skills/ai-interview/references/voicestudio-backend.md)** · [系统架构](docs/VOICESTUDIO-INTEGRATION.md) · [本轮验证](docs/VOICESTUDIO-VERIFICATION.md)。
 
 ## 五个主要入口
 

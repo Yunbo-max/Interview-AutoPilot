@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — Optional external VoiceStudio STT/TTS integration (2026-10-16)
+
+- Added loopback-only VoiceStudio capability discovery, optional HTTP TTS and batch STT, plus a same-host authenticated WebSocket relay for streaming partial/final transcriptions.
+- Added in-browser audio source selection, discovered voice profiles, separate third-party service consent, speaker playback cancellation on recording, final-only editable transcripts and batch/typing fallback.
+- Added `--voicestudio` and `--voicestudio-url` to the interview CLI, separately installable `websockets` dependency, portable Skill usage guide and source/license notices.
+- No third-party VoiceStudio code, cloned voices or model weights bundled; no automatic installs, new branches or GitHub Actions. Tests use fake local voice servers and simulated browser media, not real audio hardware.
+
 ## 0.4.0 — Private career workflow and dated research evidence (2026-10-16)
 
 - Added candidate-first `/profile`, `/scrape`, `/rank`, `/interview`, `/memory` workflow and optional `/trends` refresh. Claude Code gets repository-local command files; portable hosts continue using the canonical Skill.

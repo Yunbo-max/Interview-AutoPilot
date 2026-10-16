@@ -1,7 +1,7 @@
 {
   "name": "ai-interview",
-  "version": "0.4.0",
-  "description": "Voice-first, evidence-based AI/Quant interview and local CV/job discovery, ranking, sourced research freshness and candidate memory. No automatic applications.",
+  "version": "0.5.0",
+  "description": "Voice-first AI/Quant interviews, private career workflows, and an optional localhost VoiceStudio speech backend. No automatic applications.",
   "skills": "./skills/",
   "interface": {
     "displayName": "AI Interview",

@@ -25,7 +25,7 @@ import xml.etree.ElementTree as ET
 
 from interview_curriculum import ROLE_LABELS
 
-VERSION = '0.4.0'
+VERSION = '0.5.0'
 MAX_PROFILE_CHARS = 20_000
 MAX_DESCRIPTION_CHARS = 20_000
 MAX_FEED_BYTES = 1_500_000
@@ -533,6 +533,8 @@ def main(argv=None):
     p.add_argument('--note',default='')
     p=sub.add_parser('interview',help='Start or check the existing voice-first studio')
     p.add_argument('--doctor',action='store_true');p.add_argument('--without-stt',action='store_true');p.add_argument('--no-browser',action='store_true')
+    p.add_argument('--voicestudio',action='store_true', help='Use the separately installed localhost VoiceStudio service')
+    p.add_argument('--voicestudio-url',default='http://127.0.0.1:3900', help='Localhost only; never tunnel to the public internet')
     args=parser.parse_args(argv)
     ws=CareerWorkspace(args.workspace)
     try:
@@ -607,6 +609,9 @@ def main(argv=None):
         else:
             from interview_studio import main as studio_main
             flags=['doctor'] if args.doctor else ['serve']+(['--without-stt'] if args.without_stt else [])+(['--no-browser'] if args.no_browser else [])
+            if args.voicestudio:flags.append('--voicestudio')
+            if args.voicestudio or args.voicestudio_url!='http://127.0.0.1:3900':
+                flags.extend(['--voicestudio-url',args.voicestudio_url])
             return studio_main(flags)
         print(json.dumps(out,ensure_ascii=False,indent=2))
         return 0

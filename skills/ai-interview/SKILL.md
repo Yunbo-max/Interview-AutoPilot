@@ -5,23 +5,27 @@ description: Use when a candidate wants a grounded CV/profile, role-focused job 
 
 # AI Interview — Evidence first, freshness aware
 
-**Route the user's intent; do NOT begin an interview while doing CV editing, job discovery, ranking or memory review.** Primary workflow: `/profile → /scrape → /rank → /interview → /memory`; `/trends` refreshes dated technical sources for an interview. Read [career workflow](references/career-workflow.md) for executable commands and safeguards. Run the bundled `scripts/career.py --help` if needed, resolving paths from the actual installed Skill directory. Never invent jobs, paper results, CV achievements or model connections.
+**Route the user's intent; do NOT begin an interview while doing CV editing, job discovery, ranking or memory review.** Primary workflow: `/profile → /scrape → /rank → /interview → /memory`; `/trends` refreshes dated technical sources for an interview. Read [career workflow](references/career-workflow.md) for executable commands and safeguards. Run the bundled `scripts/career.py --help` if needed, resolving paths from the actual installed Skill directory. Never fabricate evidence or connections.
 
 ## CV, jobs, and learning records
 
-- **Profile:** accept an authorized CV/PDF; generate a source-preserving editable CV draft. External model polishing requires separate affirmative consent. Facts are candidate-provided, not independently verified.
-- **Scrape:** LinkedIn option returns a browser search link **only**; no unauthorized scraper or login automation. For machine-readable postings, use explicitly selected public Greenhouse/Lever company boards or a candidate-supplied JD. Never apply or control a browser to apply.
-- **Rank:** use role, actual JD text and candidate evidence for transparent heuristic matching. Scores are **not** hiring probabilities. Allow selecting an imported JD to tailor HR and technical questions.
-- **Memory:** only candidate-approved topic evidence and condensed interview coverage enter the private workspace. Months since last evidence are a *review reminder*, never proof someone forgot a skill.
-- **Trends:** only date/source-verified research abstracts may motivate 'current work' questions. The arXiv feed surfaces recency, HF Daily Papers may add observed community curation; neither proves scientific importance. In a fresh technical interview, re-test fundamentals **and** source-backed new topics. Offline/stale feed means no 'latest' claims.
+- **Profile:** accept an authorized CV/PDF; generate a source-preserving editable CV draft. Model polishing needs separate consent; facts remain unverified.
+- **Scrape:** LinkedIn option returns a browser search link **only**; no unauthorized scraper or login automation. Use public Greenhouse/Lever boards or supplied JDs; never apply automatically.
+- **Rank:** use role, actual JD text and candidate evidence for transparent heuristic matching. Scores are not hiring probabilities; imported JDs inform interviews.
+- **Memory:** only candidate-approved topic evidence and condensed interview coverage enter the private workspace. Stale evidence prompts review, not failure.
+- **Trends:** only date/source-verified research abstracts may motivate 'current work' questions. Date arXiv/HF sources; never invent freshness or importance.
 
-Personal files default outside the public repository. Do not publish CVs, JDs containing private applicant data, confirmed answers, raw recordings, model keys or private endpoints. No Actions/workflows and no extra Git branch are required by the Skill.
+Keep personal material and keys private. No Actions, workflows, or extra branches.
 
 ## Voice-first interview — preferred mode
 
-For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). An authorized local shell may run `scripts/interview_studio.py doctor`, and later `serve` after approved installs/downloads; remote agents cannot reach a user's computer microphone automatically.
+For a simulated interview requested by the candidate, read [voice-first studio](references/voice-first-studio.md) plus [setup](references/start-and-contract.md), [clock](references/session-and-clock.md), [cross-examination](references/adversarial-engine.md) and [privacy](references/privacy-and-security.md). Local shells may run `doctor` then consented `serve`; remote agents cannot access a microphone.
 
-The candidate uploads a searchable PDF, selects one of six roles, optionally picks a previously imported JD, chooses a model and consents to transmitting the **selected evidence** to that model. Candidate explicitly clicks to fetch new paper metadata or elects to include already cached memory. Browser TTS speaks noncoding questions, local mic captures answers on click and local STT creates a draft; **only candidate-confirmed text** is submitted. Coding uses an editor; do not execute candidate code without a real sandbox. All roles begin with adversarial HR/resume questions; later technical subjects (Quant math, LeetCode, transformers, RL, diffusion, agent harness, MLOps) depend on role and JD.
+Candidates choose role, PDF, JD and model; uploading to model and paper refresh require consent. Browser TTS and clicked microphone enable voice turns; **only confirmed text** is submitted. Coding uses an editor; never execute untrusted code. All roles begin with HR/resume questioning.
+
+## Optional local VoiceStudio STT/TTS
+
+For a candidate who explicitly wants **VoiceStudio**, first read [VoiceStudio backend — install & use](references/voicestudio-backend.md). This AGPL-3.0 app is **separately installed**, not bundled. `scripts/career.py interview --doctor --voicestudio` checks its fixed loopback protocol; `scripts/career.py interview --voicestudio --without-stt` can use its TTS, real-time streaming partial subtitles (with optional `websockets` relay), and batch STT when available. VoiceStudio requires separate consent and a microphone click. Only summary finals become **editable drafts**. Retain browser/Whisper fallbacks; never expose tokens or automatically install VoiceStudio.
 
 ## Interview turn policy
 

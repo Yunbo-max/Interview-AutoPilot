@@ -8,7 +8,13 @@
 </head>
 <body>
 <div class="app-shell">
-  <header class="topbar"><div class="wordmark"><span class="monogram">AI<span>·</span></span> INTERVIEW</div><span class="topnote">PRIVATE LOCAL STUDIO <span class="statusdot"></span></span></header>
+  <header class="topbar"><div class="wordmark"><span class="monogram">AI<span>·</span></span> INTERVIEW</div>
+  <div class="speech-settings"><label for="speech-engine">SPEECH ENGINE</label>
+    <select id="speech-engine" aria-label="Speech engine"><option value="builtin" selected>Browser TTS + local Whisper</option><option value="voicestudio">VoiceStudio (external local app)</option></select>
+    <label for="voice-profile">VOICE</label><select id="voice-profile" aria-label="VoiceStudio voice"><option value="default">Default voice</option></select>
+    <button id="check-voice" class="minimal" type="button">Check VoiceStudio</button>
+    <label class="voice-optin"><input type="checkbox" id="voicestudio-consent"> I authorize this separate local speech service; I reviewed its model/download and remote-routing settings.</label></div>
+  <span class="topnote">PRIVATE LOCAL STUDIO <span class="statusdot"></span></span></header>
   <main>
   <section id="setup" class="setup-screen">
     <div class="eyebrow">THE INTERVIEW ROOM / 01</div>
@@ -36,6 +42,7 @@
       </section>
       <section class="surface wide">
         <div class="step-index">03 / YOUR INTERVIEWER</div>
+        <p class="smallnote" id="voice-backend-status">VoiceStudio is optional. Install and run it separately, then click Check VoiceStudio. Microphone never starts during detection.</p>
         <div class="config-grid">
           <div><h2>Select a model.</h2><p>Local CLI hosts or provider APIs. Installed CLI or API key required; using online models sends your confirmed responses and resume text to that provider.</p><label for="provider">INTERVIEW ENGINE</label><select id="provider"></select><p id="provider-note" class="smallnote"></p></div>
           <div class="consent-stack"><label class="checkrow"><input type="checkbox" id="consent"><span>I consent to sending extracted resume text, confirmed answers, and any selected JD, research abstracts and memory evidence to the chosen model provider during this interview.</span></label>
@@ -66,6 +73,7 @@
       <section id="voice-panel" class="answer-card">
         <div class="card-top"><span class="step-index">CANDIDATE / MICROPHONE</span><span class="live-mark" id="record-flag">READY</span></div>
         <h3>Speak your answer.</h3><p id="voice-info">The question is spoken aloud. Click Record to speak; edit your transcript before submitting.</p>
+        <p class="smallnote" id="live-preview" aria-live="polite">Streaming transcript previews appear here when VoiceStudio is enabled. Only the final transcript can be submitted.</p>
         <div class="record-controls"><button class="record-button" id="record" aria-label="Start recording"><span class="mic-symbol">◉</span></button><div><strong id="record-state">Click to record</strong><span id="record-time" class="smallnote">Up to 03:00 per clip</span></div><button id="cancel-record" class="minimal" disabled>Discard</button></div>
         <label for="transcript">CONFIRMED ANSWER / EDIT BEFORE SUBMIT</label><textarea id="transcript" rows="6" maxlength="20000" placeholder="Speech transcript appears here; you may also type your answer."></textarea>
       </section>

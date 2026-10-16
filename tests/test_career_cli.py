@@ -69,6 +69,13 @@ class CareerCLITests(unittest.TestCase):
         self.assertEqual(o['status'],'error')
         self.assertFalse((self.workspace/'papers.json').exists())
 
+    def test_interview_forwards_optional_voicestudio_flags(self):
+        with patch('interview_studio.main', return_value=0) as studio:
+            rc=career.main(['--workspace',str(self.workspace),'interview',
+                            '--doctor','--voicestudio','--voicestudio-url','http://127.0.0.1:3901'])
+        self.assertEqual(rc,0)
+        studio.assert_called_once_with(['doctor','--voicestudio','--voicestudio-url','http://127.0.0.1:3901'])
+
     def test_no_apply_command_and_no_auto_application(self):
         out=StringIO();err=StringIO()
         with contextlib.redirect_stdout(out),contextlib.redirect_stderr(err):

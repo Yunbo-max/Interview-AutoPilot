@@ -1,4 +1,4 @@
-# AI Interview · 0.4.0
+# AI Interview · 0.5.0
 
 **Build a defensible CV. Find and rank relevant jobs. Practice demanding voice-first technical interviews. Remember what you demonstrated and what has changed in the field.**
 
@@ -7,6 +7,22 @@ This project focuses on the interview and research-learning lifecycle, **with no
 `/profile → /scrape → /rank → /interview → /memory` — with optional `/trends` research freshness checks before and during technical interview preparation.
 
 [中文说明](README.zh-CN.md) · [Skill](skills/ai-interview/SKILL.md) · [Career workflow](skills/ai-interview/references/career-workflow.md) · [Evidence/verification](docs/CAREER-VERIFICATION.md)
+
+## New in 0.5.0: optional VoiceStudio speech backend
+
+**VoiceStudio is now integrated as an optional external local speech service** (not copied or bundled). Keep the default lightweight Browser SpeechSynthesis + local Faster-Whisper flow, or connect an independently installed VoiceStudio for synthetic interviewer audio, streaming live subtitles, and HTTP batch transcription when streaming is unavailable. Candidate microphone permission and review-before-submit remain mandatory; Coding questions still use the editor.
+
+Install the standalone app from [official VoiceStudio releases](https://github.com/debpalash/VoiceStudio/releases/latest), review its selected models/downloads and any remote routing, then install the *optional* `requirements-voicestudio.txt` Python WebSocket relay dependency. Start locally:
+
+```bash
+python -m pip install -r skills/ai-interview/scripts/requirements-voicestudio.txt
+python skills/ai-interview/scripts/career.py interview --doctor --voicestudio
+python skills/ai-interview/scripts/career.py interview --without-stt --voicestudio
+```
+
+In the Studio header choose **Check VoiceStudio → separate-service consent → VoiceStudio**. This does not replace your chosen LLM/agent as interviewer. If no optional backend is available, keep using the browser/Whisper or typing. Intel macOS computers cannot use the VoiceStudio packaged local Python backend; our independent Whisper CPU mode still remains available.
+
+For full installation, OS notes, speech protocols, model licenses and security constraints, see [the VoiceStudio guide](skills/ai-interview/references/voicestudio-backend.md), [architecture](docs/VOICESTUDIO-INTEGRATION.md) and [local verification](docs/VOICESTUDIO-VERIFICATION.md). VoiceStudio is **AGPL-3.0**, its models/weights have separate licenses, and none are included in this MIT repository. Installed VoiceStudio may route to remote speech providers or download weights depending on its configuration; our separate explicit checkbox is required before its use.
 
 ## Why this differs
 

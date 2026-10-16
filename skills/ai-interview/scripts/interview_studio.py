@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 import webbrowser
 
 from mic_stt import Handler as LocalHandler, AppState, MAX_AUDIO_BYTES
+from voicestudio_adapter import VoiceStudioAdapter
 from interview_core import InterviewSession, read_resume_pdf, MAX_CV_BYTES
 from interview_curriculum import ROLE_PLANS, ROLE_LABELS
 from interview_models import ModelRouter, PROVIDERS
@@ -22,11 +23,11 @@ from career import (CareerWorkspace, briefing_for_role, memory_brief, topic_revi
     get_public_bytes, arxiv_search_url, parse_arxiv_feed, parse_hf_daily, HF_BASE, utcnow)
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '0.3.0'
+VERSION = '0.5.0'
 
 
 class StudioState(AppState):
-    def __init__(self, router=None, speech=None, token=None, workspace=None):
+    def __init__(self, router=None, speech=None, token=None, workspace=None, voicestudio=None):
         super().__init__(speech, Path.home()/'.cache/ai-interview/studio-unused',
                          token=token or secrets.token_urlsafe(32), model_name='optional local Whisper')
         self.router = router or ModelRouter()
@@ -36,13 +37,50 @@ class StudioState(AppState):
         self.research_lock = threading.Lock()
         self.memory_save_lock = threading.Lock()
         self.memory_saved = None
+        self.voicestudio = voicestudio
+        self.voicestudio_relay = None  # Optional, bounded localhost WebSocket relay
 
 
 class StudioHandler(LocalHandler):
-    server_version = 'AIInterviewStudio/0.3'
+    server_version = 'AIInterviewStudio/0.5'
+
+    def send_bytes(self, status:int, body:bytes, content_type:str) -> None:
+        """Only our verified local relay port may receive browser WS audio."""
+        relay = getattr(self.state, 'voicestudio_relay', None)
+        connect_src = "'self'"
+        if relay and getattr(relay,'url',None):
+            from urllib.parse import urlsplit as _split
+            endpoint = _split(relay.url)
+            if endpoint.hostname == '127.0.0.1' and endpoint.scheme == 'ws':
+                connect_src += f' ws://127.0.0.1:{endpoint.port}'
+        self.send_response(status)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length',str(len(body)))
+        self.send_header('Cache-Control','no-store')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.send_header('Referrer-Policy','no-referrer')
+        self.send_header('Permissions-Policy','microphone=(self), camera=(), display-capture=()')
+        self.send_header('Content-Security-Policy',
+             f"default-src 'self'; script-src 'self'; style-src 'self'; connect-src {connect_src}; "
+             "media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'")
+        self.end_headers()
+        try:self.wfile.write(body)
+        except (BrokenPipeError,ConnectionResetError):pass
     def do_GET(self):
         path=urlsplit(self.path).path
         if not self.authorized(path.startswith('/api/')):return
+        if path=='/api/voicestudio/status':
+            if self.state.voicestudio is None:
+                self.json(200,{'available':False,'streaming':False,'voices':[],
+                    'detail':'VoiceStudio adapter disabled; select --voicestudio to enable.'});return
+            data=self.state.voicestudio.status().copy()
+            if not self.state.voicestudio_relay:
+                data['streaming']=False
+                data['relay_url']=None
+                data['note']='Streaming relay unavailable; batch STT and TTS may still work.'
+            else:
+                data['relay_url']=self.state.voicestudio_relay.url
+            self.json(200,data);return
         if path=='/api/health':
             self.json(200,{'version':VERSION,'speech_ready':self.state.speech is not None,'audio_limit':MAX_AUDIO_BYTES,
                            'note':'Local-only HTTP server; model providers may send confirmed text externally'})
@@ -88,10 +126,46 @@ class StudioHandler(LocalHandler):
             except ValueError as exc:self.json(400,{'error':str(exc)})
             except RuntimeError as exc:self.json(503,{'error':str(exc)})
             return
+        if path=='/api/voicestudio/speak':
+            if self.state.voicestudio is None:
+                self.json(503, {'error':'VoiceStudio is not enabled for this session.'});return
+            if self.headers.get('Content-Type','').split(';')[0].strip().lower()!='application/json':
+                self.json(415,{'error':'JSON content required'});return
+            body=self.read_body(14_000)
+            if body is None:return
+            try:
+                data=json.loads(body)
+                if not isinstance(data,dict):raise ValueError('Expected JSON object')
+                question_id=data.get('question_id')
+                with self.state.interview.lock:
+                    current=self.state.interview.current_question
+                    if (self.state.interview.status!='active' or not current or
+                            current.get('kind')=='code' or current.get('id')!=question_id or
+                            current.get('question')!=data.get('text')):
+                        raise ValueError('Only the active spoken interview question can be synthesized.')
+                voice=data.get('voice','default')
+                audio=self.state.voicestudio.speak(data['text'],voice)
+                with self.state.interview.lock:
+                    current=self.state.interview.current_question
+                    if (self.state.interview.status!='active' or not current or
+                            current.get('id')!=question_id):
+                        raise ValueError('Question changed while voice was generating; audio discarded.')
+                self.send_bytes(200,audio,'audio/wav')
+            except (ValueError,TypeError,KeyError,json.JSONDecodeError) as e:
+                self.json(409,{'error':str(e)})
+            except (RuntimeError,OSError) as e:
+                self.json(502,{'error':str(e)})
+            return
         if path=='/api/transcribe':
-            if self.state.speech is None:
-                self.json(503,{'error':'Speech model not loaded; type your answer or install local faster-whisper'});return
-            if not self.headers.get('Content-Type','').lower().startswith(('audio/','video/webm','video/mp4','application/octet-stream')):
+            selected=parse_qs(urlsplit(self.path).query).get('backend',['builtin'])[0]
+            if selected not in ('builtin','voicestudio'):
+                self.json(400,{'error':'Unknown speech backend'});return
+            if selected=='builtin' and self.state.speech is None:
+                self.json(503,{'error':'Local Whisper not loaded; type your answer or enable VoiceStudio'});return
+            if selected=='voicestudio' and self.state.voicestudio is None:
+                self.json(503,{'error':'VoiceStudio is not enabled'});return
+            mime=self.headers.get('Content-Type','').lower()
+            if not mime.startswith(('audio/','video/webm','video/mp4','application/octet-stream')):
                 self.json(415,{'error':'Audio content required'});return
             if not self.state.transcription_lock.acquire(blocking=False):
                 self.json(409,{'error':'Another audio clip is being transcribed'});return
@@ -99,10 +173,16 @@ class StudioHandler(LocalHandler):
                 body=self.read_body(MAX_AUDIO_BYTES)
                 if body is None:return
                 if not body: self.json(400,{'error':'Empty recording'});return
-                result=self.state.speech.transcribe(body,None)
-                self.json(200,{'raw_text':result.get('raw_text',''),'duration_seconds':result.get('duration_seconds')})
+                if selected=='voicestudio':
+                    text=self.state.voicestudio.transcribe(body,mime)
+                    result={'raw_text':text, 'backend':'voicestudio', 'final':True}
+                else:
+                    decoded=self.state.speech.transcribe(body,None)
+                    result={'raw_text':decoded.get('raw_text',''),
+                            'duration_seconds':decoded.get('duration_seconds'), 'backend':'builtin', 'final':True}
+                self.json(200,result)
             except Exception as exc:
-                self.json(422,{'error':f'Local audio decoding failed ({type(exc).__name__}); you may type your answer'})
+                self.json(422,{'error':f'Speech recognition failed ({type(exc).__name__}); you may type your answer'})
             finally:self.state.transcription_lock.release()
             return
         if path not in ('/api/start','/api/answer','/api/pause','/api/resume-session','/api/finish','/api/trends-refresh','/api/save-memory'):
@@ -184,16 +264,24 @@ def make_server(state:StudioState,port=0):
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Local AI interview studio; requires explicit microphone permission')
     sub=parser.add_subparsers(dest='action',required=True)
-    sub.add_parser('doctor')
+    d=sub.add_parser('doctor')
+    d.add_argument('--voicestudio', action='store_true', help='Check optional local VoiceStudio service')
+    d.add_argument('--voicestudio-url',default='http://127.0.0.1:3900')
     p=sub.add_parser('download-model');p.add_argument('--allow-download',action='store_true');p.add_argument('--model',default='base')
     p=sub.add_parser('serve');p.add_argument('--port',type=int,default=0)
     p.add_argument('--model',default='base');p.add_argument('--without-stt',action='store_true')
+    p.add_argument('--voicestudio',action='store_true',help='Enable optional external local VoiceStudio service (never installs it)')
+    p.add_argument('--voicestudio-url',default='http://127.0.0.1:3900',help='Only http://127.0.0.1:<port> permitted')
     p.add_argument('--no-browser',action='store_true');p.add_argument('--compute-type',choices=('int8','float32'),default='int8')
     args=parser.parse_args(argv)
     if args.action=='doctor':
-        print(json.dumps({'python':sys.version.split()[0],'pypdf_installed':importlib.util.find_spec('pypdf') is not None,
+        data={'python':sys.version.split()[0],'pypdf_installed':importlib.util.find_spec('pypdf') is not None,
             'faster_whisper_installed':importlib.util.find_spec('faster_whisper') is not None,
-            'providers':ModelRouter().availability(),'microphone_tested':False},ensure_ascii=False,indent=2))
+            'providers':ModelRouter().availability(),'microphone_tested':False}
+        if args.voicestudio:
+            data['voicestudio']=VoiceStudioAdapter(args.voicestudio_url).status()
+            data['voicestudio_websockets_installed']=importlib.util.find_spec('websockets') is not None
+        print(json.dumps(data,ensure_ascii=False,indent=2))
         return 0
     if args.action=='download-model':
         if not args.allow_download:
@@ -208,15 +296,32 @@ def main(argv=None):
             speech=LocalWhisper(args.model,compute_type=args.compute_type)
         except (RuntimeError,ImportError,ValueError,OSError) as exc:
             print('Speech model unavailable; typed answers remain available. Use doctor/download-model. '+str(type(exc).__name__),file=sys.stderr)
-    state=StudioState(speech=speech)
+    voicestudio=VoiceStudioAdapter(args.voicestudio_url) if args.voicestudio else None
+    state=StudioState(speech=speech,voicestudio=voicestudio)
     server=make_server(state,args.port)
+    if voicestudio is not None:
+        speech_status=voicestudio.status()
+        if speech_status['available'] and speech_status['streaming']:
+            try:
+                from voicestudio_relay import VoiceStudioRelay
+                relay=VoiceStudioRelay(state,voicestudio)
+                relay.start()
+                state.voicestudio_relay=relay
+                print('VoiceStudio streaming relay ready on loopback.', file=sys.stderr)
+            except (ImportError,RuntimeError,OSError) as exc:
+                print('Streaming relay unavailable; VoiceStudio batch STT/TTS can still work. '
+                      +type(exc).__name__,file=sys.stderr)
+        elif not speech_status['available']:
+            print('VoiceStudio not reachable. Start its backend, then restart AI-Interview to enable it.',file=sys.stderr)
     url=state.origin+'/#token='+state.token
     print('Local private studio URL (never publish): '+url,flush=True)
     print('PDF and interview content stay in process memory; model calls send confirmed text to the selected provider after consent.',flush=True)
     if not args.no_browser:webbrowser.open(url)
     try:server.serve_forever()
     except KeyboardInterrupt:pass
-    finally:server.server_close()
+    finally:
+        server.server_close()
+        if state.voicestudio_relay:state.voicestudio_relay.stop()
     return 0
 
 if __name__=='__main__':raise SystemExit(main())

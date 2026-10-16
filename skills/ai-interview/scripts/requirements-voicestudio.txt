@@ -1,0 +1,4 @@
+# OPTIONAL: Install only for VoiceStudio live transcription via the private relay.
+# VoiceStudio itself is a separately installed AGPL-3.0 application.
+# Neither its app source nor model weights are bundled into this MIT skill.
+websockets>=15,<17

@@ -46,3 +46,10 @@ No existing third-party interview skill was copied into this package. Cross-exam
 | [Hugging Face Daily Papers](https://huggingface.co/papers) | Curated research discovery. The optional `/api/daily_papers` endpoint is a public observed interface, not a formally versioned integration contract, and may change; tests use fixtures. |
 
 Publication timestamp and retrieval timestamp are deliberately separate. Prior-review age is merely a signal to *retest*, not a psychological or ability claim. The local career workflow does not send private applicant data to paper sources; the candidate may independently consent to sending selected paper metadata/JD/CV to their model provider.
+
+## Optional VoiceStudio third-party backend (checked 2026-10-16)
+
+- [VoiceStudio speech platform](https://github.com/debpalash/VoiceStudio/blob/main/docs/speech-platform.md): stable discovery document and HTTP/WS endpoint names; `partial` and `final_kind: summary` difference.
+- [VoiceStudio MCP](https://github.com/debpalash/VoiceStudio/blob/main/docs/mcp.md): optional separate MCP for Codex/Claude/Gemini; this web UI does not require MCP and does not embed any vendor source.
+- [VoiceStudio install](https://github.com/debpalash/VoiceStudio/blob/main/docs/install/macos.md): packaged local backend unavailable on Intel macOS; use the optional existing Whisper mode.
+- [VoiceStudio license notice](https://github.com/debpalash/VoiceStudio/blob/main/LICENSE-NOTICE.md) and [model inventory](https://github.com/debpalash/VoiceStudio/blob/main/docs/licensing/model-inventory.md): AGPL-3.0 source and separately licensed model assets; independent public-protocol use is not a blanket redistribution or commercial-use right.

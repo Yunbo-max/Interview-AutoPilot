@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="362" viewBox="0 0 1440 362" role="img" aria-label="Five-stage career preparation loop from profile and job discovery to interview and private memory, with opt-in current research">
+<defs><linearGradient id="paper" x1="0" x2="1"><stop stop-color="#F2F6F1"/><stop offset="1" stop-color="#EAF1E9"/></linearGradient></defs>
+<rect width="1440" height="362" rx="22" fill="url(#paper)"/>
+<text x="33" y="53" font-family="Arial,sans-serif" font-size="13" font-weight="750" letter-spacing="2" fill="#376B59">THE LEARNING LOOP</text>
+<text x="33" y="92" font-family="Arial,sans-serif" font-size="28" fill="#162D28" font-weight="750">From your evidence to your next challenge.</text>
+<rect x="1095" y="42" width="305" height="54" rx="16" fill="#D3E5D5" stroke="#B7D1BD"/>
+<text x="1112" y="64" font-family="Arial,sans-serif" font-size="15" font-weight="750" fill="#244F3F">/trends</text>
+<text x="1112" y="84" font-family="Arial,sans-serif" font-size="11" fill="#517D68">Opt-in dated arXiv / HF context</text>
+<g><rect x="33" y="130" width="256" height="164" rx="18" fill="#FFFFFF" stroke="#CAD7D0" stroke-width="1.5"/>
+  <text x="51" y="160" font-family="Arial,sans-serif" font-size="12" letter-spacing="1.6" fill="#61776B" font-weight="700">01</text>
+  <text x="51" y="203" font-family="Arial,sans-serif" font-size="27" font-weight="750" fill="#102F29">/profile</text>
+  <text x="51" y="232" font-family="Arial,sans-serif" font-size="15" fill="#61776B">CV evidence</text>
+  <text x="51" y="259" font-family="Arial,sans-serif" font-size="12.5" fill="#61776B">Candidate-reviewed draft</text></g><path d="M299 212l8 0m-4 -4l4 4l-4 4" stroke="#88A499" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g><rect x="314" y="130" width="256" height="164" rx="18" fill="#FFFFFF" stroke="#CAD7D0" stroke-width="1.5"/>
+  <text x="332" y="160" font-family="Arial,sans-serif" font-size="12" letter-spacing="1.6" fill="#61776B" font-weight="700">02</text>
+  <text x="332" y="203" font-family="Arial,sans-serif" font-size="27" font-weight="750" fill="#102F29">/scrape</text>
+  <text x="332" y="232" font-family="Arial,sans-serif" font-size="15" fill="#61776B">Find roles</text>
+  <text x="332" y="259" font-family="Arial,sans-serif" font-size="12.5" fill="#61776B">Public boards + links</text></g><path d="M580 212l8 0m-4 -4l4 4l-4 4" stroke="#88A499" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g><rect x="595" y="130" width="256" height="164" rx="18" fill="#FFFFFF" stroke="#CAD7D0" stroke-width="1.5"/>
+  <text x="613" y="160" font-family="Arial,sans-serif" font-size="12" letter-spacing="1.6" fill="#61776B" font-weight="700">03</text>
+  <text x="613" y="203" font-family="Arial,sans-serif" font-size="27" font-weight="750" fill="#102F29">/rank</text>
+  <text x="613" y="232" font-family="Arial,sans-serif" font-size="15" fill="#61776B">Compare fit</text>
+  <text x="613" y="259" font-family="Arial,sans-serif" font-size="12.5" fill="#61776B">Explainable heuristic</text></g><path d="M861 212l8 0m-4 -4l4 4l-4 4" stroke="#88A499" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g><rect x="876" y="130" width="256" height="164" rx="18" fill="#173B32" stroke="#275A49" stroke-width="1.5"/>
+  <text x="894" y="160" font-family="Arial,sans-serif" font-size="12" letter-spacing="1.6" fill="#B9E5CB" font-weight="700">04</text>
+  <text x="894" y="203" font-family="Arial,sans-serif" font-size="27" font-weight="750" fill="#F7FFF4">/interview</text>
+  <text x="894" y="232" font-family="Arial,sans-serif" font-size="15" fill="#B9E5CB">Defend your work</text>
+  <text x="894" y="259" font-family="Arial,sans-serif" font-size="12.5" fill="#B9E5CB">Speech + code + follow-up</text></g><path d="M1142 212l8 0m-4 -4l4 4l-4 4" stroke="#88A499" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g><rect x="1157" y="130" width="256" height="164" rx="18" fill="#FFFFFF" stroke="#CAD7D0" stroke-width="1.5"/>
+  <text x="1175" y="160" font-family="Arial,sans-serif" font-size="12" letter-spacing="1.6" fill="#61776B" font-weight="700">05</text>
+  <text x="1175" y="203" font-family="Arial,sans-serif" font-size="27" font-weight="750" fill="#102F29">/memory</text>
+  <text x="1175" y="232" font-family="Arial,sans-serif" font-size="15" fill="#61776B">Revisit gaps</text>
+  <text x="1175" y="259" font-family="Arial,sans-serif" font-size="12.5" fill="#61776B">Opt-in evidence notes</text></g>
+<text x="35" y="333" font-family="Arial,sans-serif" font-size="12" fill="#6F8678">No auto-applications  ·  Candidate confirms speech transcripts  ·  Research freshness does not equal correctness</text>
+</svg>

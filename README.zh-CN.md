@@ -1,127 +1,128 @@
-# AI Interview 0.6.0 · 简历、岗位、语音面试与前沿知识追踪
+<div align="center">
+  <img src="docs/assets/hero.svg" alt="AI Interview：不仅要懂，更要能为你的推理和研究辩护。" width="100%" />
 
-我们的目标不是做另一个自动投递简历工具，而是**让技术人才持续准备真正有难度、紧贴岗位要求和最新研究进展的面试**。
+  <p><strong>以语音为主的技术面试 · 简历与科研对抗追问 · 有来源的最新知识挑战</strong></p>
+  <p>
+    <a href="#一键开始">一键开始</a> ·
+    <a href="#我们与其他项目有什么区别">项目对比</a> ·
+    <a href="#实际面试体验">体验流程</a> ·
+    <a href="README.md">English</a>
+  </p>
+  <p>
+    <img alt="Version 0.6.0" src="https://img.shields.io/badge/version-0.6.0-234f3d?style=flat-square" />
+    <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-234f3d?style=flat-square" />
+    <img alt="Mac one-click setup" src="https://img.shields.io/badge/Mac-one--click_setup-a7d79f?style=flat-square" />
+    <img alt="Local-first voice" src="https://img.shields.io/badge/voice-local--first-a7d79f?style=flat-square" />
+  </p>
+</div>
 
-新工作流：**`/profile → /scrape → /rank → /interview → /memory`**。独立的 `/trends` 用于更新岗位相关论文和技术热点。保留 0.3.0 的本地语音网页、六类岗位、一小时目标阶段规划和七种模型适配方案。
+**我们不想再造一个背题工具。** AI-Interview 从你的真实简历出发，让你解释项目贡献、方法局限、实验是否公平；再根据岗位考察 Transformer、RL、Quant、Agent、Diffusion 等基础与前沿。它是**真实面试之前的练习工具**，不是面试作弊助手，也不自动投递简历。
 
-## MacBook Pro 一键安装启动（0.6.0 新增）
+## 一键开始
 
-现在本地 Codex、Claude Code、Gemini CLI 或 macOS Finder 可以直接执行
-**一条命令**完成安装并启动网页：
+在支持的 **MacBook Pro / Apple Silicon** 上，既可以让本地 Codex、Claude Code、Gemini CLI 运行安装命令，也可以通过 Finder 双击 `AI-Interview.command`：
 
 ```bash
-# 在你的 MacBook Pro 上克隆源码后执行；不要让云端容器代替 Mac 安装
 git clone https://github.com/Yunbo-max/AI-Interview.git
 cd AI-Interview
 bash AI-Interview.command --yes
 ```
 
-**也可以在 Finder 双击 `AI-Interview.command`**，并按提示同意网络下载。
-脚本自动检测 Python；如果当前 Mac 只有旧版 Python，会通过已有 uv/Homebrew，
-或下载经过固定 SHA256 校验的官方 uv 二进制来安装 Python 3.11，不需要 sudo
-或远程 `curl | sh` 脚本。随后建立私有虚拟环境、安装 Python 依赖、下载本地
-Faster-Whisper base 备用模型，并给 Codex/Claude 安装完整 Skill 的符号链接。
-M 系列 Mac 如果尚未安装 VoiceStudio，会从官方 GitHub Release 下载**ARM64
-DMG + SHA256SUMS**并在校验后复制到 `~/Applications`。不会复制第三方源码到
-我们 MIT 仓库；Intel Mac 则自动保留原本的 Whisper/浏览器语音。
+第一次运行会准备独立 Python 环境与依赖，下载本地 Whisper 备用模型；M 系列 Mac 可以下载并校验**独立安装的 VoiceStudio 官方 DMG**，然后启动本机面试网页。**但 Mac 麦克风权限、第三方模型许可证、系统安全确认仍由你本人批准。** 作为面试官的 Codex/Claude/Gemini 需提前登录，其他模型需要对应 API Key。
 
-面试服务会在 Mac 本地后台启动，**让 Agent 的工具调用及时结束**，并自动
-打开私有浏览器页面。重复执行不会开第二个服务：
+<details>
+<summary><strong>更多选项：检查环境、轻量模式、停止面试服务</strong></summary>
 
 ```bash
-bash AI-Interview.command --doctor          # 环境检查，不改电脑配置
-bash AI-Interview.command --dry-run         # 看会安装什么，不下载
-bash AI-Interview.command --launch-only     # 再次打开现有面试
-bash AI-Interview.command --stop            # 使用令牌安全关闭本地服务
-bash AI-Interview.command --yes --no-voicestudio # 仅轻量 Whisper
+bash AI-Interview.command --doctor              # 只读检查
+bash AI-Interview.command --dry-run             # 预览安装操作
+bash AI-Interview.command --launch-only         # 重新打开已有面试会话
+bash AI-Interview.command --stop                # 通过本机令牌停止服务
+bash AI-Interview.command --no-voicestudio --yes  # 不安装 VoiceStudio
 ```
 
-需要明确：**Mac 上安装和允许麦克风必须在你的 Mac 上发生**，本 ChatGPT
-无法从云端打开你的麦克风。VoiceStudio 首次启动时的 macOS Gatekeeper
-批准、模型许可证与模型下载设置，及浏览器麦克风权限，都仍需你完成。
-本命令不会替你创建 Qwen、DeepSeek、GLM、Kimi API Key，也不会自动登录
-Codex/Claude/Gemini。默认模型面试调用的是你选定的在线提供商。
-详见 [一键启动与 Agent 指南](skills/ai-interview/references/one-click-mac.md)。
+VoiceStudio 官方打包的本地后端要求 **Apple Silicon + macOS 13.3+**；Intel Mac 可使用独立的 Faster-Whisper 和浏览器朗读方案。VoiceStudio 官方建议约 **10 GB 磁盘空间**用于基础应用及运行环境，额外模型可能需要更多。真实 Mac 安装过程与语音速度仍须实机验证。
 
-## 0.5.0：可选 VoiceStudio 实时语音后端
+[Mac / Agent 一键安装指南](skills/ai-interview/references/one-click-mac.md) · [VoiceStudio 使用说明](skills/ai-interview/references/voicestudio-backend.md)
 
-**已经加入 VoiceStudio 的协议适配代码、实时语音中继、网页切换和安装说明。** 它是一个**独立安装的第三方程序**，我们不复制它的 AGPL-3.0 源码或模型权重，因此 AI-Interview 仍然保持 MIT 代码仓库。
+</details>
 
-先从 [VoiceStudio 官方 Releases](https://github.com/debpalash/VoiceStudio/releases/latest) 下载与你操作系统匹配的安装包（核对 SHA-256），打开应用，在它的 Model Manager 内选择并安装 STT/TTS 模型。确认它的后端在本机 `127.0.0.1:3900` 运行。**Intel Mac 无法使用 VoiceStudio 打包的本地 Python 后端**，可以继续使用 AI-Interview 自带的 Faster-Whisper CPU 方案。
+## 实际面试体验
 
-在本地 AI-Interview 仓库虚拟环境中执行：
+<div align="center">
+  <img src="docs/assets/studio-preview.svg" alt="面试网页示意：上传 PDF 简历、选择目标岗位与语音引擎。" width="100%" />
+  <sub>根据当前网页界面绘制的示意图；不是现场录屏、真实候选人数据或模型效果展示。</sub>
+</div>
 
-```bash
-python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
-python -m pip install -r skills/ai-interview/scripts/requirements-voicestudio.txt
-python skills/ai-interview/scripts/career.py interview --doctor --voicestudio
-python skills/ai-interview/scripts/career.py interview --without-stt --voicestudio
-```
+| 面试前 | 面试中 | 面试结束 |
+| :--- | :--- | :--- |
+| 上传**可提取文字的 PDF 简历**，核对内容；选择六类岗位之一，可选岗位 JD 与近期研究论文。 | **AI 用声音问**，你用麦克风答；核对最终转写再提交。Coding 题自动切换代码编辑器。 | 查看**模型生成的复盘与参考解**、导出报告，按需保存一份精简的私人 Memory。 |
 
-在面试网页顶部点 **Check VoiceStudio → 明确勾选独立语音服务授权 → Speech Engine 选择 VoiceStudio**，就可以让 AI 用 VoiceStudio 的音频朗读问题，候选人点击录音后使用实时字幕和最后的语音汇总。系统会在你停止录音、人工核对和主动点击提交后，才把文字交给选定面试模型。录音时会停止面试官正在播放的声音；Coding 则继续用编辑器。流式模型不可用时可以回退到 VoiceStudio 批量识别；也可以继续用浏览器朗读和本地 Whisper。
+语音是主要交互形式，但也支持文字输入。可选 VoiceStudio 实时字幕只是预览；**只有你确认并点击提交的文字才会交给面试官模型。** 当前为**逐轮对话**，不是真正全双工通话；代码编辑器**不执行提交的代码**。
 
-**重要隐私边界：** 我们只把音频交给本机 VoiceStudio 服务；但 VoiceStudio 自身可选远程语音引擎，也可能首次使用时下载模型。你必须先检查它的设置和模型许可证，再在网页授权。与在线 LLM 处理你确认后的答案是两份独立的权限。没有经过你设备的实际语音验证，不能保证流畅度和延迟。
+### 六类岗位
 
-完整逐步操作：**[VoiceStudio 安装和使用说明](skills/ai-interview/references/voicestudio-backend.md)** · [系统架构](docs/VOICESTUDIO-INTEGRATION.md) · [本轮验证](docs/VOICESTUDIO-VERIFICATION.md)。
+| Quant / 工程 | AI / 研究 |
+| :--- | :--- |
+| **Quant Researcher**：概率、统计、随机过程、Python、研究方法 | **AI Researcher**：Attention、模型架构、RL、实验设计、消融 |
+| **Quant Developer**：算法、数据结构、复杂度、并发与性能 | **LLM / Agent Engineer**：Coding、Transformer、MCP、工具调用、Planning、评估 |
+| **ML Engineer**：ML 基础、训练、部署、系统设计 | **Generative AI Researcher**：Diffusion、Score/Flow Matching、多模态与研究方法 |
 
-## 五个主要入口
+所有岗位都从 **HR + 简历真实性与个人贡献深挖**开始。技术题与追问根据岗位、JD、回答不断调整。60 分钟是目标流程，并非已经通过一小时真实语音压力测试。
 
-| 命令 | 功能 | 重要边界 |
-|---|---|---|
-| `/profile` | 读取简历 PDF/文本，形成私人的、可编辑 Markdown CV 草稿；可在明确同意后让模型润色 | 未证明真实经历的内容不会自动当成事实，也不会自动提交 CV |
-| `/scrape` | 提供 LinkedIn 招聘搜索链接，或读取 Greenhouse/Lever 企业公开招聘 API；可导入用户指定的 JD | **不自动爬取 LinkedIn，不登录或绕开反爬**，不控制鼠标申请 |
-| `/rank` | 依据岗位、JD、简历实际内容做可解释的相关性排序 | 分数是简单启发式匹配，不是录取率或求职成功概率 |
-| `/interview` | 上传 CV、选择岗位/可选 JD、语音问答、Coding 编辑器、HR 对抗、技术深挖 | 语音在本机处理；模型仍可能通过网络处理你确认的内容；代码不执行 |
-| `/memory` | 保存你明确同意的历次面试覆盖情况及知识点证据，提醒哪些知识应重新验证 | **半年没练习不是“失去能力”**；没有证据必须再测，而不是直接扣分 |
+## 从准备到持续复练
 
-`/trends` 是支持命令：从 **arXiv** 获取有发表日期和抓取日期的论文元数据、摘要，或从 **Hugging Face Daily Papers** 获取社区推荐信号。它不是简单把六个月前的新闻冒充今天的前沿，也不把热门度当科学证据。最新研究材料只在你选择允许之后进入技术面试追问；**HR/简历轮不被论文新闻打断**。
+<div align="center"><img src="docs/assets/workflow.svg" alt="Profile、Scrape、Rank、Interview、Memory 五阶段学习闭环；Trends 用于可选研究更新。" width="100%" /></div>
 
-## 三类不同的“知识状态”
+| 命令 | 实际行为 |
+| :--- | :--- |
+| **`/profile`** | 本地读取 PDF 简历，生成保留来源的可编辑 Markdown 草稿；需明确同意才交给模型润色。 |
+| **`/scrape`** | 生成 LinkedIn **职位搜索链接**、读取公开 Greenhouse/Lever 企业招聘接口，或导入 JD。**不非法爬取 LinkedIn。** |
+| **`/rank`** | 基于简历与 JD 展示可解释的岗位匹配和能力缺口；**不是录取概率**。 |
+| **`/interview`** | 按岗位进行语音面试、简历反驳、技术追问与可选 Coding。 |
+| **`/memory`** | 经你主动确认后记录覆盖阶段和知识证据，供后续复练；默认不存完整对话。 |
+| **`/trends`（辅助）** | 可选检索有日期的 arXiv / Hugging Face Daily Papers 摘要，为技术面试提供前沿追问线索。**摘要不等于论文实验验证。** |
 
-- **基本原理已经证明掌握**：例如 Transformer Attention 的计算机制，历史回答有足够的具体证据。
-- **需要再测**：上一次给出有证据的回答距今很久，系统安排新题检查；这不是失去能力的断言。
-- **领域发生新变化**：检索到了有出处、日期的新论文/技术，再针对基线、缺陷、实验、公平性追问；摘要不等于完整论文审阅。
+**很久没有测试 ≠ 忘记知识。** Memory 区分“已有证据证明掌握”“需要再次检验”和“领域出现新技术”。最新论文使用明确的发表与抓取日期；热度不能代替科学证据。
 
-这样 AI Researcher 的数学和架构基础与对最新 Attention/RL 论文的了解会被分开评估；Quant 会重点看统计、随机过程及金融领域相关研究；Agent Engineer 的工具协议、Harness、规划与评测变化频繁，可更短周期复练。
+## 我们与其他项目有什么区别
 
-## 本地开始使用（Mac / Linux）
+**语音面试不是我们独创的。** 真正的差异是：围绕 Quant、LLM、Agent、生成模型和 AI Research 的**项目/科研对抗**，加入**有来源和日期的近期研究问题**，再与候选人控制的能力复练记录联系起来。
 
-```bash
-git clone https://github.com/Yunbo-max/AI-Interview.git
-cd AI-Interview
-python3 -m venv .venv && source .venv/bin/activate
-python -m pip install -r skills/ai-interview/scripts/requirements-studio.txt
+| 对比 | **AI-Interview（我们）** | [ai-job-search](https://github.com/MadsLorentzen/ai-job-search) | [DeepInterview](https://github.com/ngoanpv/DeepInterview) | [VoiceStudio](https://github.com/debpalash/VoiceStudio) |
+| :--- | :--- | :--- | :--- | :--- |
+| **主要定位** | 技术与科研面试训练 | 求职、简历和申请管理 | 实时语音模拟面试与复盘 | 语音生成及识别工具 |
+| **面试方式** | **逐轮语音**、简历技术反驳、动态追问 | 按实际申请准备，聊天式模拟 | **实时语音**，其直播链路支持插话 | 提供语音 API，**不负责面试** |
+| **专业方向** | **Quant / ML / Attention / RL / Agent / Diffusion** | 按职位和申请阶段定制 | CV/JD 驱动的自适应问答与题库 | ASR/TTS 模型及声音管理 |
+| **最新知识** | 可选**有日期的 arXiv/HF 摘要追问** | 公司、岗位信息研究 | 公司研究与学习辅导 | 非面试科研产品 |
+| **长期记录** | 可选知识证据与覆盖记录，不预设能力退化 | 投递、反馈、结果档案 | 面试评分与学习教练 | 声音与音频项目历史 |
+| **现有局限** | 无代码执行、全双工和真实 Mac 长测认证 | 不是独立的实时语音面试应用 | 实时直播链路依赖更多组件/配置 | 需单独安装，AGPL 与模型许可独立 |
 
-# 建立简历资料；生成待人工检查的 Markdown CV 草稿
-python skills/ai-interview/scripts/career.py profile --resume /你的私有目录/CV.pdf --role ai_researcher
+<sub>基于截至 2026-10-16 的公开项目说明进行**功能定位对比**，不是 GitHub Trending 排名、真实性能测试，也不表示其他项目绝对不支持某项未列功能。DeepInterview 的实时语音链路比我们当前的逐轮方案更成熟。</sub>
 
-# 产生 LinkedIn 搜索链接（不自动抓取 LinkedIn）
-python skills/ai-interview/scripts/career.py scrape --linkedin "LLM Agent Engineer" --location London
+## AI 的“大脑”和“声音”可以分别选择
 
-# 企业公开招聘数据（替换为真实公司 board 名称）
-python skills/ai-interview/scripts/career.py scrape --greenhouse company-slug
-# 或：python skills/ai-interview/scripts/career.py scrape --lever company-slug
+| 层次 | 可选方案 | 要点 |
+| :--- | :--- | :--- |
+| **面试官（推理）** | Codex CLI、Claude Code CLI、Gemini CLI、Qwen、DeepSeek、GLM、Kimi | CLI 需要本地登录；API 需要 Key。七种适配已编写，**尚未全部实机验证**。 |
+| **默认语音** | 浏览器 SpeechSynthesis + 本地 Faster-Whisper | 不必安装 VoiceStudio；下载 Whisper 模型后可以在本机转写。 |
+| **可选语音** | [VoiceStudio](https://github.com/debpalash/VoiceStudio) | 独立本地软件，支持 TTS 和实时/批量 STT。**是否完全本地取决于它选择的引擎**，许可条件另算。 |
 
-# 岗位排序与研究更新
-python skills/ai-interview/scripts/career.py rank --role ai_researcher
-python skills/ai-interview/scripts/career.py trends --role ai_researcher --source arxiv
+### 隐私和真实性说明
 
-# 语音面试网页（无 Whisper 时可先用文字输入）
-python skills/ai-interview/scripts/career.py interview --without-stt
-```
+- **用户简历、录音、未提交的回答不会上传公开 GitHub。** PDF 本地解析，程序不主动持久保存录音；私人工作目录默认为 `~/.local/share/ai-interview/`。
+- **面试不一定完全离线。** 在你授权后，选择的 LLM 可能收到简历、JD 和确认回答；VoiceStudio 若选了远程引擎，也可能发送音频到外部服务。
+- **不会自动投递或辅助真实面试作弊。** 不登录 LinkedIn、不控制鼠标、不直接运行候选人代码，也不凭声音推断人格、情绪或能力。
+- **测试与实机效果要分开。** v0.6.0 有 157 项 Python 测试及五组网页模拟测试通过；真实 Mac、麦克风效果、不同模型账号以及完整一小时语音面试**尚未全部认证**。
 
-要使用本地麦克风转文字，请额外安装 `skills/ai-interview/scripts/requirements-voice.txt`，明确授权下载 Whisper 模型，并运行 `python skills/ai-interview/scripts/career.py interview`。浏览器逐轮朗读非 Coding 题；你按麦克风按钮回答，确认转写再提交。Coding 仍在编辑器输入。
+[一键安装验证](docs/ONE-CLICK-MAC-VERIFICATION.md) · [VoiceStudio 桥接验证](docs/VOICESTUDIO-VERIFICATION.md) · [求职流程验证](docs/CAREER-VERIFICATION.md) · [研究来源规范](docs/SOURCES.md)
 
-面试设置页现在可以选取 `/scrape` 缓存的具体 JD，还可以点击 **Refresh research** 主动获取本岗位最新论文元数据；勾选允许新论文/已记录知识证据进入提问。面试结束后的 **Save private memory summary** 完全是可选操作，仅保存阶段覆盖和数量，不自动永久保存完整问答。
+---
 
-## 需要理解的限制
-
-**关于 LinkedIn**：目前公开条款不允许未经授权的爬虫或机器人自动化访问。因此 `/scrape --linkedin` 只生成你自己浏览的搜索链接，真实抓取使用 Greenhouse/Lever 官方公开职位接口，或者导入你手动选好的 JD。我们不宣传它能稳定爬完整 LinkedIn。
-
-**关于 CV**：默认草稿保留来源文字；使用 `--polish-with codex|claude|gemini|qwen|deepseek|glm|kimi --allow-model-transfer` 可选择让外部模型起草更整洁的 Markdown，但其事实必须人工审核，不能保证导出精确版式的 PDF。
-
-**关于模型**：Codex、Claude Code、Gemini CLI 需要本地安装和登录；Qwen、DeepSeek、GLM、Kimi 需要对应 API Key。未经实机验证的接入不能宣称全部联调成功。不使用 Hermes Agent。
-
-**关于隐私**：用户资料默认保存在 `~/.local/share/ai-interview/`，不上传 GitHub。技术论文刷新会访问公开研究服务，但不会附带用户简历。将确认文本和所选 JD 交给在线模型，需要显式同意。原始音频不会由应用主动写盘。
-
-**关于验证**：程序提供离线自动回归测试；真实 arXiv/HF/Greenhouse/Lever 网络响应、真实麦克风、模型账号和一小时稳定性需要在你的机器上再验证。详见 [验证报告](docs/CAREER-VERIFICATION.md) 与 [Skill 调用说明](skills/ai-interview/references/career-workflow.md)。
+<div align="center">
+  <strong>Defend your work. Explain the fundamentals. Keep up with what changed.</strong>
+  <br />
+  <sub>Open source · MIT · Local-first · 真正的面试之前，先把每个主张讲清楚。</sub>
+  <br />
+  <a href="README.md">English</a> · <a href="skills/ai-interview/SKILL.md">Skill 说明</a>
+</div>

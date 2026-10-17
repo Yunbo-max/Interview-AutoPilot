@@ -123,7 +123,12 @@ class ModelRouter:
         binary=p['binary']
         if not self.which(binary):raise RuntimeError(f'{binary} CLI is not installed or not on PATH; authenticate it before use')
         if provider=='codex':
-            argv=[binary,'exec','--sandbox','read-only','--ask-for-approval','never','--skip-git-repo-check','-']
+            argv=[binary,'exec','--sandbox','read-only','--skip-git-repo-check','-']
+            model=self.env.get('AI_INTERVIEW_CODEX_MODEL')
+            if model:
+                if not re.fullmatch(r'[A-Za-z0-9_.:/-]{1,100}',model):
+                    raise ValueError('Invalid configured Codex model ID')
+                argv[2:2]=['--model',model]
         elif provider=='claude':
             argv=[binary,'--print','--output-format','json','--max-turns','1',
                   '--permission-mode','dontAsk','--tools','']

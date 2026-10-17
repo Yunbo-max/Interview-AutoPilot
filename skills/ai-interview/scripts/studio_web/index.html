@@ -37,7 +37,7 @@
         <label for="job-target">SPECIFIC JOB / JD (OPTIONAL)</label>
         <select id="job-target"><option value="">General role interview (no selected JD)</option></select>
         <p id="job-note" class="smallnote">Import a public posting with /scrape, then return here to target that job.</p>
-        <label for="language">INTERVIEW LANGUAGE</label><select id="language"><option value="zh" selected>中文 / Chinese</option><option value="en">English</option></select>
+        <label for="language">INTERVIEW LANGUAGE</label><select id="language"><option value="zh">中文 / Chinese</option><option value="en" selected>English</option></select>
         <label for="focus">SPECIALIZATION / JD HINT (OPTIONAL)</label><input id="focus" maxlength="300" placeholder="e.g. Diffusion architecture, systematic trading...">
       </section>
       <section class="surface wide">
@@ -65,7 +65,7 @@
     <div class="session-meta"><span id="role-label">INTERVIEW</span><span id="phase-label">HR + RESUME</span><span id="clock" class="tabnums">60:00 REMAINING</span></div>
     <div class="progress"><div id="progress-fill"></div></div>
     <div class="question-plate">
-      <div class="question-header"><span class="eyebrow">INTERVIEWER / <span id="question-id">QUESTION 01</span></span><div class="answer-actions"><button id="replay" class="minimal">↻ Play question</button><button id="pause" class="minimal">Pause</button><button id="finish" class="minimal warning">End interview</button></div></div>
+      <div class="question-header"><span class="eyebrow">INTERVIEWER / <span id="question-id">QUESTION 01</span></span><div class="answer-actions"><button id="replay" class="minimal">↻ Play question</button><button id="toggle-voice" class="minimal" type="button">Enable voice</button><button id="pause" class="minimal">Pause</button><button id="finish" class="minimal warning">End interview</button></div></div>
       <h2 id="question-text" aria-live="polite">Your interview starts here.</h2>
       <div id="question-mode" class="mode-chip">SPOKEN ANSWER</div>
       <section class="timekeeper-panel" aria-label="Local timekeeper supervision">

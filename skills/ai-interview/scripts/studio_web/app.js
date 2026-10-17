@@ -51,6 +51,13 @@ function builtinSpeak(q){
   u.onerror=()=>notice('Browser speech playback was blocked. Click Play question to retry.');
   window.speechSynthesis.speak(u);context.lastSpoken=q.id;
 }
+el('toggle-voice').addEventListener('click',()=>{
+  context.muted=!context.muted;
+  el('toggle-voice').textContent=context.muted?'Enable voice':'Mute voice';
+  if(context.muted)stopPlayback();
+  else if(context.question)speak(context.question);
+  notice(context.muted?'Spoken questions muted.':'Spoken questions enabled.');
+});
 async function refreshVoiceStudio(showNotice=false){
   try{
     const data=await api('/api/voicestudio/status');
@@ -242,6 +249,8 @@ function renderQuestion(q){
   el('record-state').textContent='Click to record';el('record-time').textContent='Up to 03:00 per clip';
   el('live-preview').textContent='Streaming partials are not graded; wait for final text.';
   el('record-flag').textContent='READY';
+  el('toggle-voice').textContent=context.muted?'Enable voice':'Mute voice';
+  if(!canRecord())el('voice-info').textContent='Microphone recording is unavailable because local Whisper is not installed. Type your answer below, or install Whisper to enable Record.';
   speak(q);
   setBusy(context.busy);
 }

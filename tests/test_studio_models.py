@@ -49,6 +49,28 @@ class ModelTests(unittest.TestCase):
             self.assertGreater(timeout,0)
             self.assertNotIn('danger-full-access',args)
 
+    def test_codex_cli_uses_current_read_only_exec_flags(self):
+        from interview_models import ModelRouter
+        calls=[]
+        def fake(argv,stdin,timeout):
+            calls.append(argv)
+            return '{"question":"Next","assessment":""}'
+        r=ModelRouter(run_cli=fake,which=lambda x:'/usr/bin/'+x)
+        r.generate('resume context','codex')
+        self.assertEqual(calls[0][:4],['codex','exec','--sandbox','read-only'])
+        self.assertNotIn('--ask-for-approval',calls[0])
+
+    def test_codex_cli_model_can_be_selected_by_environment(self):
+        from interview_models import ModelRouter
+        calls=[]
+        def fake(argv,stdin,timeout):
+            calls.append(argv)
+            return '{"question":"Next","assessment":""}'
+        r=ModelRouter(environ={'AI_INTERVIEW_CODEX_MODEL':'gpt-5.6-luna'},run_cli=fake,which=lambda x:'/usr/bin/'+x)
+        r.generate('resume context','codex')
+        self.assertIn('--model',calls[0])
+        self.assertEqual(calls[0][calls[0].index('--model')+1],'gpt-5.6-luna')
+
     def test_excessive_prompt_or_invalid_response(self):
         from interview_models import ModelRouter
         r=ModelRouter(environ={'DEEPSEEK_API_KEY':'key'},http_post=lambda *_:{'choices':[]})
